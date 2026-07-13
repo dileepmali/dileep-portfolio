@@ -1,0 +1,614 @@
+/* ============================================================
+   HOME — CINEMATIC 3D REDESIGN
+   Scoped entirely under .home-cinematic so other pages are untouched.
+   Dark, glowing, glassmorphic — inspired by the 3D-website references.
+   ============================================================ */
+
+.home-cinematic {
+  position: relative;
+  background: #060409;
+  color: #d8def0;
+  isolation: isolate;
+}
+
+/* pinned hero — stays fixed at the top while the content scrolls up over it */
+.home-cinematic .hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 0;
+}
+/* scroll runway during which the flower grows to the top (hero stays pinned) */
+.home-cinematic .hero-grow-spacer {
+  height: 95vh;
+}
+/* the rest of the page slides over the pinned hero (needs a solid backdrop) */
+.home-cinematic .home-scroll {
+  position: relative;
+  z-index: 1;
+  background:
+    radial-gradient(120% 60% at 50% 0%, #0c0a18 0%, #060409 55%);
+}
+
+/* fixed aurora / mesh-gradient backdrop */
+.home-cinematic::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(55% 45% at 82% -5%, rgba(124, 58, 237, 0.34), transparent 60%),
+    radial-gradient(50% 40% at 8% 12%, rgba(37, 99, 235, 0.26), transparent 60%),
+    radial-gradient(60% 55% at 50% 112%, rgba(219, 39, 119, 0.18), transparent 60%),
+    #060409;
+}
+
+/* faint technical grid, faded toward the edges */
+.home-cinematic::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 62px 62px;
+  -webkit-mask-image: radial-gradient(circle at 50% 24%, #000 15%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 24%, #000 15%, transparent 72%);
+}
+
+/* every section rides on the shared cinematic backdrop */
+.home-cinematic .section,
+.home-cinematic #about,
+.home-cinematic #services,
+.home-cinematic #resume,
+.home-cinematic .testi,
+.home-cinematic #projects,
+.home-cinematic #blogs,
+.home-cinematic #contact,
+.home-cinematic .cta {
+  background: transparent;
+}
+
+/* per-section accent colour (drives badges, glows, borders) */
+.home-cinematic #about    { --acc: #3b82f6; --acc2: #60a5fa; }
+.home-cinematic #services { --acc: #f97316; --acc2: #fb923c; }
+.home-cinematic #resume   { --acc: #f59e0b; --acc2: #fcd34d; }
+.home-cinematic .testi    { --acc: #22c55e; --acc2: #4ade80; }
+.home-cinematic #projects { --acc: #2563eb; --acc2: #38bdf8; }
+.home-cinematic #blogs    { --acc: #ec4899; --acc2: #f472b6; }
+.home-cinematic #contact  { --acc: #14b8a6; --acc2: #2dd4bf; }
+
+/* ---------- shared section header ---------- */
+.home-cinematic .section-head h2 {
+  color: #f4f6ff;
+  letter-spacing: -0.02em;
+}
+.home-cinematic .section-head p { color: #9aa6c2; }
+.home-cinematic .badge {
+  background: color-mix(in srgb, var(--acc, #7c3aed) 16%, transparent);
+  color: var(--acc2, #a78bfa);
+  border: 1px solid color-mix(in srgb, var(--acc, #7c3aed) 40%, transparent);
+  box-shadow: 0 0 24px -6px color-mix(in srgb, var(--acc, #7c3aed) 60%, transparent);
+}
+.home-cinematic .section-head h2::after {
+  background: linear-gradient(90deg, var(--acc, #7c3aed), transparent) !important;
+}
+
+/* =====================  HERO (gallery-09 replica)  ===================== */
+/* teal → dark-navy background sampled from the reference banner */
+.home-cinematic .hero {
+  padding: 170px 0 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background:
+    radial-gradient(120% 100% at 55% 44%, #0a5a78 0%, #06304e 44%, #02132a 100%);
+}
+/* underwater god rays — soft light shafts from the surface, gently swaying */
+.home-cinematic .hero-godrays {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  background: repeating-linear-gradient(
+    100deg,
+    transparent 0, transparent 64px,
+    rgba(130, 225, 255, 0.06) 74px, rgba(150, 235, 255, 0.14) 96px,
+    rgba(130, 225, 255, 0.06) 118px, transparent 128px, transparent 200px
+  );
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.4) 45%, transparent 78%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.4) 45%, transparent 78%);
+  animation: godrays 16s ease-in-out infinite alternate;
+}
+@keyframes godrays {
+  from { transform: translateX(-5%) skewX(-3deg); }
+  to   { transform: translateX(5%) skewX(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-cinematic .hero-godrays { animation: none; }
+}
+.home-cinematic .hero::before { display: none; }      /* kill the peach panel */
+.home-cinematic .hero-reveal-canvas { display: none; } /* keep the look clean */
+
+.home-cinematic .hero-grid {
+  grid-template-columns: 1fr;
+  min-height: auto;
+  position: relative;
+  z-index: 2;
+}
+/* centered text, like the reference banner */
+.home-cinematic .hero-text {
+  text-align: center;
+  padding-bottom: 0;
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.home-cinematic .hero-text .greet {
+  color: #7fe3ff;
+  text-transform: uppercase;
+  letter-spacing: 0.34em;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.home-cinematic .hero-text h1 {
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 16px 0 30px;
+}
+.home-cinematic .typed {
+  background: linear-gradient(120deg, #67e8f9 0%, #a5f3fc 50%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border-right-color: #67e8f9;
+}
+.home-cinematic .hero .btn {
+  background: linear-gradient(120deg, #0ea5b7, #22d3ee);
+  box-shadow: 0 14px 38px -12px rgba(14, 165, 183, 0.75);
+  padding: 14px 30px;
+}
+
+/* live 3D pink wave surface (three.js) across the hero bottom */
+.home-cinematic .hero-visual {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: min(56vh, 560px);
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: bottom center; /* grows upward from a fixed bottom */
+}
+/* magenta glow pooled behind the waves */
+.home-cinematic .hero-visual::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8%;
+  width: 92%;
+  height: 72%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(55% 90% at 50% 100%, rgba(233, 46, 176, 0.55), transparent 72%),
+    radial-gradient(40% 70% at 30% 90%, rgba(124, 58, 237, 0.35), transparent 70%),
+    radial-gradient(40% 70% at 72% 92%, rgba(56, 189, 248, 0.22), transparent 70%);
+  filter: blur(46px);
+  z-index: -1;
+}
+.home-cinematic #hero-waves {
+  width: 100%;
+  height: 100%;
+}
+.home-cinematic #hero-waves canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  /* fade the top of the canvas so the far edge melts into the teal (no hard line) */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
+}
+/* soft transition from the teal hero into the dark sections below */
+.home-cinematic .hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 90px;
+  background: linear-gradient(to bottom, transparent, #060409);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* =====================  GLASS CARDS  ===================== */
+.home-cinematic .service-card,
+.home-cinematic .proj-card,
+.home-cinematic .blog-card,
+.home-cinematic .skill-card,
+.home-cinematic .timeline .tl-item,
+.home-cinematic .testi-wrap,
+.home-cinematic .contact-info,
+.home-cinematic .contact-grid form {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 26px 60px -34px rgba(0, 0, 0, 0.85);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+.home-cinematic .service-card { border-radius: 18px; }
+.home-cinematic .service-card:hover,
+.home-cinematic .proj-card:hover,
+.home-cinematic .blog-card:hover,
+.home-cinematic .skill-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--acc, #7c3aed) 55%, transparent);
+  box-shadow:
+    0 34px 70px -30px rgba(0, 0, 0, 0.9),
+    0 0 40px -12px color-mix(in srgb, var(--acc, #7c3aed) 70%, transparent);
+}
+.home-cinematic .service-card h3,
+.home-cinematic .proj-card h4,
+.home-cinematic .blog-card h4,
+.home-cinematic .skill-card h4 { color: #f2f5ff; }
+.home-cinematic .service-card p,
+.home-cinematic .skill-card span,
+.home-cinematic .proj-card .sub { color: #93a0bd; }
+.home-cinematic .service-ico { box-shadow: 0 0 30px -8px currentColor; }
+
+/* ---------- About ("Tailored in Three Dimensions" — blue + 3D crystal) ---------- */
+/* About pins within this wrapper; Skills scrolls over it, then About releases
+   once the wrapper (About + Skills) has passed — so it never peeks behind later
+   sections. */
+.home-cinematic .about-stack { position: relative; }
+/* pinned like the hero: it sticks to the top while the NEXT section scrolls up
+   over it. Fully opaque so nothing shows through the stack. */
+.home-cinematic #about {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
+  z-index: 1;
+  background:
+    radial-gradient(85% 80% at 72% 48%, rgba(30, 120, 220, 0.3), transparent 60%),
+    linear-gradient(165deg, #072048 0%, #061a3a 45%, #02102a 100%),
+    #02102a;
+}
+/* the section that slides OVER the pinned About — opaque, higher layer */
+.home-cinematic #skills {
+  position: relative;
+  z-index: 2;
+  background:
+    radial-gradient(70% 60% at 50% 0%, rgba(30, 120, 220, 0.14), transparent 60%),
+    linear-gradient(180deg, #060b18 0%, #050912 100%),
+    #060409;
+}
+.home-cinematic .about-block {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 4%;
+  min-height: 100vh; /* full-screen About; skills come separately below on scroll */
+  padding-bottom: 0;
+}
+.home-cinematic .about-block-text {
+  position: relative;
+  z-index: 2;
+  max-width: 34rem;
+}
+@media (max-width: 860px) {
+  .home-cinematic .about-block {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+.home-cinematic .about-block-text h2 {
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  color: #7fd8f5;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 16px 0 22px;
+  text-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
+}
+.home-cinematic .about-block-text .badge {
+  --acc: #38bdf8;
+  --acc2: #7dd3fc;
+}
+.home-cinematic .about-lead {
+  color: #b6c8e2;
+  font-size: 1.06rem;
+  line-height: 1.85;
+  margin-bottom: 22px;
+  max-width: 30rem;
+}
+.home-cinematic .about-block-text .about-details b { color: #5fd0ff; }
+.home-cinematic .about-block-text .about-details div { color: #8ea3c4; }
+
+/* full-section layer so the cubes fly in from every edge of the section
+   (behind the text, which sits above via z-index) */
+.home-cinematic .about-visual {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.home-cinematic .about-visual::before {
+  content: "";
+  position: absolute;
+  inset: 6% 2% 6% 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 68% 50%, rgba(37, 130, 230, 0.16), transparent 60%);
+  filter: blur(52px);
+  z-index: -1;
+}
+.home-cinematic #about-shape3d { width: 100%; height: 100%; }
+.home-cinematic #about-shape3d canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.home-cinematic .skills-head {
+  text-align: center;
+  margin: 64px 0 36px;
+}
+/* ---------- combined Skills + Services hexagon honeycomb ---------- */
+.home-cinematic .honeycomb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 44px 0 18px;
+}
+.home-cinematic .hc-row { display: flex; gap: 12px; }
+.home-cinematic .hc-row + .hc-row { margin-top: -46px; }
+.home-cinematic .hex {
+  width: 168px;
+  height: 194px;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background:
+    radial-gradient(120% 92% at 50% 4%, color-mix(in srgb, var(--cc, #38bdf8) 30%, transparent), transparent 56%),
+    linear-gradient(160deg, rgba(26, 33, 55, 0.97), rgba(11, 15, 28, 0.98));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+  transition: filter 0.3s ease;
+}
+/* continuous floating wave — ripples across the grid via a staggered phase */
+.home-cinematic .honeycomb.in .hex {
+  animation: hex-float 4.2s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -0.32s);
+}
+@keyframes hex-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+.home-cinematic .hex:hover {
+  filter: drop-shadow(0 22px 40px color-mix(in srgb, var(--cc, #38bdf8) 64%, transparent));
+  z-index: 4;
+}
+.home-cinematic .hex-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 26px;
+  transition: transform 0.28s ease;
+}
+/* hidden before reveal, then a staggered pop-in */
+.home-cinematic .honeycomb:not(.in) .hex-in { opacity: 0; transform: scale(0.35); }
+.home-cinematic .honeycomb.in .hex-in {
+  animation: hex-pop 0.6s cubic-bezier(0.2, 1.2, 0.3, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes hex-pop {
+  from { opacity: 0; transform: scale(0.35) rotate(-8deg); }
+  to { opacity: 1; transform: none; }
+}
+.home-cinematic .hex:hover .hex-in { transform: scale(1.12); }
+.home-cinematic .hex-ico {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--cc, #38bdf8) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cc, #38bdf8) 34%, transparent);
+  box-shadow: 0 0 24px -10px currentColor;
+}
+/* ambient glow that breathes in a ripple across the grid */
+.home-cinematic .honeycomb.in .hex-ico {
+  animation: hex-glow 3.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 130ms);
+}
+@keyframes hex-glow {
+  0%, 100% { box-shadow: 0 0 22px -11px currentColor; }
+  50% { box-shadow: 0 0 34px -3px currentColor; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-cinematic .honeycomb.in .hex,
+  .home-cinematic .honeycomb.in .hex-in,
+  .home-cinematic .honeycomb.in .hex-ico { animation: none; }
+  .home-cinematic .honeycomb:not(.in) .hex-in { opacity: 1; transform: none; }
+}
+.home-cinematic .hex-name {
+  color: #eef3ff;
+  font-weight: 700;
+  font-size: 0.94rem;
+  line-height: 1.15;
+}
+.home-cinematic .hex-sub {
+  color: #8ea3c4;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 560px) {
+  .home-cinematic .hex { width: 132px; height: 152px; }
+  .home-cinematic .hc-row + .hc-row { margin-top: -36px; }
+  .home-cinematic .hex-in { padding: 0 16px; }
+  .home-cinematic .hex-name { font-size: 0.82rem; }
+}
+.home-cinematic .skills-head h3 {
+  color: #f2f5ff;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  font-weight: 700;
+  margin-top: 12px;
+}
+@media (max-width: 820px) {
+  .home-cinematic .about-block { min-height: 90vh; }
+}
+
+/* ---------- About (shared) ---------- */
+.home-cinematic .about-info h3,
+.home-cinematic .contact-grid h3 { color: #f2f5ff; }
+.home-cinematic .about-info h3::after {
+  background: rgba(124, 58, 237, 0.4);
+}
+.home-cinematic .about-details div { color: #93a0bd; }
+.home-cinematic .about-details b { color: #a78bfa; }
+.home-cinematic .social-row a {
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #b7c2db;
+}
+.home-cinematic .social-row a:hover {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #fff;
+}
+/* soft edges on the skills marquee */
+.home-cinematic .skills-marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ---------- Resume timeline ---------- */
+.home-cinematic .timeline .tl-item { border-radius: 14px; margin-bottom: 14px; }
+.home-cinematic .tl-head .tt { color: #eef1fa; }
+.home-cinematic .tl-period,
+.home-cinematic .tl-body p { color: #93a0bd; }
+.home-cinematic .tl-body .place { color: #a78bfa; }
+.home-cinematic .resume-aside h4 { color: #f2f5ff; }
+.home-cinematic .tag {
+  background: rgba(124, 58, 237, 0.16);
+  color: #c4b5fd;
+  border: 1px solid rgba(124, 58, 237, 0.35);
+}
+
+/* ---------- Testimonials ---------- */
+.home-cinematic .testi-wrap { border-radius: 22px; padding: 46px; }
+.home-cinematic .testi-quote { color: #dfe5f4; }
+.home-cinematic .testi-name { color: #f2f5ff; }
+.home-cinematic .testi-brand { color: var(--acc2, #4ade80); }
+.home-cinematic .testi-arrow {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dfe5f4;
+}
+
+/* ---------- Projects filters ---------- */
+.home-cinematic .proj-filters button {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #b7c2db;
+}
+.home-cinematic .proj-filters button.active {
+  background: linear-gradient(120deg, #2563eb, #38bdf8);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ---------- Blogs ---------- */
+.home-cinematic .blog-card { border-radius: 18px; overflow: hidden; }
+.home-cinematic .blog-meta span { color: #93a0bd; }
+
+/* ---------- CTA ---------- */
+.home-cinematic .cta {
+  background:
+    linear-gradient(120deg, rgba(124, 58, 237, 0.22), rgba(37, 99, 235, 0.16)),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+  width: min(1180px, 92%);
+  margin: 0 auto;
+  padding: 46px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.home-cinematic .cta-text h3 { color: #ffffff; }
+.home-cinematic .cta-text p { color: #b7c2db; }
+.home-cinematic .cta-form input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eef1fa;
+}
+.home-cinematic .cta-form button {
+  background: linear-gradient(120deg, #7c3aed, #2563eb);
+  color: #fff;
+}
+
+/* ---------- Contact ---------- */
+.home-cinematic .contact-grid form { border-radius: 22px; padding: 34px; }
+.home-cinematic .contact-grid p { color: #93a0bd; }
+.home-cinematic .field label { color: #b7c2db; }
+.home-cinematic .field input,
+.home-cinematic .field textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #eef1fa;
+}
+.home-cinematic .field input::placeholder,
+.home-cinematic .field textarea::placeholder { color: #6c7999; }
+.home-cinematic .ci-item b { color: #f2f5ff; }
+.home-cinematic .ci-item span { color: #93a0bd; }
+.home-cinematic .ci-ico {
+  background: rgba(20, 184, 166, 0.16);
+  color: #2dd4bf;
+}
+
+/* =====================  NAVBAR over the dark home  ===================== */
+body:has(.home-cinematic) .nav:not(.scrolled) {
+  background: transparent;
+  box-shadow: none;
+}
+body:has(.home-cinematic) .nav:not(.scrolled) .logo,
+body:has(.home-cinematic) .nav:not(.scrolled) .nav-links a,
+body:has(.home-cinematic) .nav:not(.scrolled) .theme-toggle,
+body:has(.home-cinematic) .nav:not(.scrolled) .burger {
+  color: #eef1fa;
+}
+body:has(.home-cinematic) .nav:not(.scrolled) .nav-links a:hover,
+body:has(.home-cinematic) .nav:not(.scrolled) .nav-links a.active {
+  color: #a78bfa;
+}
+body:has(.home-cinematic) .nav.scrolled {
+  background: rgba(10, 8, 18, 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+@media (max-width: 860px) {
+  .home-cinematic .hero-visual { height: 42vh; }
+  .home-cinematic .hero { min-height: 90vh; padding-top: 130px; }
+}
