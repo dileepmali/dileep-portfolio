@@ -1,0 +1,3281 @@
+/* ==========================================================================
+   Design system
+   --------------------------------------------------------------------------
+   Palette and rhythm follow the reference brief: a bone/cream ground rather
+   than white, pure black ink, and one loud accent that appears rarely enough
+   to stay loud. Dark sections invert the whole thing.
+
+   Sizing is fluid throughout. The layout is driven by viewport-relative
+   clamp() rather than breakpoint-swapped pixel values, which is why the type
+   keeps its proportions between a laptop and a large display instead of
+   stranding the headline in the middle of the screen.
+   ========================================================================== */
+
+:root {
+  /* ground */
+  --bone: #dfdece;
+  --bone-lift: #ebeada;
+  --bone-warm: #e4e0ce;
+
+  /*
+   * The rail's cards, measured off the reference and then re-based.
+   *
+   * Its card is #dcdbca on a #d5cfbe ground — lighter than what it sits on by
+   * (7, 12, 12). Ours sits on a bone that is already lighter than that ground,
+   * so the raw value would come out *darker* than the page and the cards would
+   * read as holes rather than as panels. Copying the relationship instead keeps
+   * the reference's look on our palette.
+   *
+   * The edge is lighter than the fill, not darker — the reference draws its
+   * cards with a highlight, which is why they read as raised rather than as
+   * boxes outlined on the page.
+   */
+  --rail-card: #e5e4d4;
+  --rail-edge: #eeedde;
+  /* A step darker than the card, not lighter: the pills were within a couple of
+     values of the panel behind them and read as flat text rather than as a set
+     of buttons. */
+  --rail-pill: #dbdac8;
+  --rail-pill-edge: #d2d1be;
+  /* Darker again, for the one inset well in the drawer. */
+  --rail-inset: #d2d1bd;
+  --rail-inset-edge: #c8c7b2;
+
+  /* ink */
+  --ink: #000000;
+  --ink-60: rgba(0, 0, 0, 0.6);
+  --ink-40: rgba(0, 0, 0, 0.4);
+  --ink-12: rgba(0, 0, 0, 0.12);
+
+  /* the one loud colour */
+  --accent: #ffff23;
+
+  /* supporting */
+  --muted: #c2b8ac;
+  --slate: #758696;
+
+  /*
+   * A filled chip on a bone card, and the step it takes on hover.
+   *
+   * Down the same warm axis as the ground rather than toward grey, so a chip
+   * reads as the card pressed in rather than as a foreign object laid on it.
+   * Far enough from the bone to be unmistakably a control, nowhere near the
+   * dark the full-bleed sections use — that much contrast at this size punches
+   * a hole in the card.
+   */
+  --chip: #b0ae99;
+  --chip-deep: #9d9b86;
+
+  /* dark sections */
+  --dark: #000000;
+  --dark-lift: #222222;
+  --on-dark: #f4f3ec;
+  --on-dark-60: rgba(244, 243, 236, 0.6);
+  --on-dark-16: rgba(244, 243, 236, 0.16);
+
+  /* type */
+  --display: "Clash Display", "Switzer", system-ui, sans-serif;
+  --body: "Switzer", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* fluid scale */
+  --t-display: clamp(2.75rem, 8.2vw, 9rem);
+  --t-h2: clamp(2rem, 5vw, 4.5rem);
+  --t-h3: clamp(1.25rem, 2vw, 1.875rem);
+  --t-lead: clamp(1.0625rem, 1.35vw, 1.375rem);
+  --t-body: clamp(0.9375rem, 1.05vw, 1.0625rem);
+  --t-label: clamp(0.6875rem, 0.8vw, 0.8125rem);
+
+  /* rhythm */
+  --gutter: clamp(1.25rem, 4vw, 5rem);
+  --wrap: 96rem;
+  --section-y: clamp(6rem, 14vh, 12rem);
+  --nav-h: 4.5rem;
+  /*
+   * The left rail. Two tokens rather than one number in three places: the rail
+   * sets its own width from these, the page reserves the matching room, and the
+   * two cannot drift apart into an overlap.
+   */
+  --rail-w: clamp(12rem, 16vw, 17rem);
+  --rail-pad: clamp(0.75rem, 1.4vh, 1.25rem);
+
+  /*
+   * The portrait's geometry, shared.
+   *
+   * The card beside it has to sit at its edge, and the two are measured in
+   * different units otherwise: the photo is sized from viewport height, the
+   * layout around it from viewport width. A fixed margin between them therefore
+   * only lines up at one window size and drifts everywhere else.
+   *
+   * 0.7584 is the source PNG's aspect ratio (700 ÷ 923). Replacing the image
+   * with a differently proportioned one means updating this number.
+   *
+   * The ceiling is the fade, not the frame. The box is pinned at the top of the
+   * panel and the crown sits a couple of percent below its edge, so height buys
+   * size without ever cutting the head off; what it does move is the mask's
+   * lower stop, and that has to finish above the fold or the crop's hard bottom
+   * edge arrives back on screen. 88% of 110vh lands at 97vh — near the limit,
+   * which is why this is 110 and not more.
+   */
+  --photo-h: 110vh;
+  --photo-w: calc(var(--photo-h) * 0.7584);
+
+  /* The hero grid's column gap, as a token because the trait card has to cancel
+     it exactly to sit flush against the portrait. */
+  --hero-gap: clamp(1rem, 2.5vw, 3rem);
+
+  /* How far the nav row sits below the top of the hero's interface layer. The
+     trait card is positioned against that same line, so the two must read it
+     from one place — hard-coding it twice is how they drift apart. */
+  --navrow-gap: clamp(1rem, 2.6vh, 2.25rem);
+
+  /* The interface layer's own top padding. The trait card is absolutely
+     positioned, so it measures from the padding box and has to add this back to
+     land on the nav row's line. */
+  --front-pad-top: clamp(0.5rem, 1.2vh, 1rem);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* `clip` rather than `hidden`: overflow-hidden on a scroll ancestor
+     silently disables every position:sticky descendant, which would take out
+     both the hero and the stacked work panels. */
+  overflow-x: clip;
+}
+
+body {
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Off-screen until focused. The hero is three viewports of scripted motion, so
+   this is the only reasonable way past it from the keyboard. */
+.skip {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.5rem;
+  background: var(--ink);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-150%);
+  transition: transform 0.25s var(--ease);
+}
+
+.skip:focus-visible {
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------- typography */
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.display {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--t-display);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--t-h2);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--t-h3);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: var(--ink-60);
+  max-width: 46ch;
+}
+
+/* Small caps label. Every section opens with one — it is the device that
+   makes a long single page feel indexed rather than endless. */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.hl {
+  color: var(--ink);
+  background: var(--accent);
+  padding: 0 0.12em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Keeps a comma welded to its word so a line break can never orphan it. */
+.nb {
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------- preload */
+
+/*
+ * The title card. Hidden unless the document is marked `data-preload`, which
+ * only the inline script in index.html sets and only the motion engine clears
+ * (with a timed failsafe behind it). Nothing here can strand a visitor behind
+ * a full-screen overlay: with no JS the attribute is never set at all.
+ */
+.preload {
+  display: none;
+}
+
+/*
+ * The loading card deliberately reproduces the hero's own layout — same ground
+ * colour, same top padding, same column flow — so the name it carries lands in
+ * precisely the box the hero wordmark occupies.
+ *
+ * That is what lets the opening be a single horizontal slide. An earlier pass
+ * centred a smaller name here and used Flip to grow it into place, which read
+ * as two moves: the name arrived, then it resized. Matching the geometry up
+ * front means the letters are full size the whole way across and the handover
+ * at the end is a swap between two identical boxes.
+ */
+[data-preload] .preload {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--nav-h);
+  background: var(--bone);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.preload-name {
+  will-change: transform;
+}
+
+/* ------------------------------------------------------------------- nav */
+
+/*
+ * A left-hand drawer, fixed and outside the hero. Its assembly is driven by the
+ * hero's scroll progress but it has to outlive the hero — a rail nested in the
+ * pinned panel would scroll away with it.
+ *
+ * `pointer-events: none` on the shell with `auto` on the controls: the rail is
+ * full-height, and a transparent full-height column would otherwise swallow
+ * clicks meant for the page beside it.
+ */
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 60;
+  width: var(--rail-w);
+  padding: var(--rail-pad) 0 var(--rail-pad) var(--rail-pad);
+  display: flex;
+  pointer-events: none;
+}
+
+/*
+ * `min-width: 0` is load-bearing.
+ *
+ * A flex item's automatic minimum size is its content's minimum, and the
+ * ticker's track is `width: max-content` — twenty-four labels on one line. That
+ * made this column refuse to shrink below the full length of the strip, and the
+ * whole drawer stretched across the window with the cards following it. The
+ * override lets the column be as wide as the rail says and clip the strip.
+ */
+.rail-inner {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.2vh, 0.9rem);
+}
+
+/* The shell is click-through; only the controls are not. The button belongs in
+   this list as much as the links do — without it the copy icon would look live
+   and do nothing. */
+.rail a,
+.rail button {
+  pointer-events: auto;
+}
+
+/*
+ * Every block wears the same card: a light wash with a hairline edge. The rail
+ * reads as a stack of separate cards in the reference, not as one panel with
+ * rules through it, and that difference is what keeps it from looking like a
+ * sidebar bolted onto the page.
+ */
+.rail-brand,
+.rail-stats,
+.rail-links,
+.rail-ticker,
+.rail-email {
+  position: relative;
+  padding: clamp(0.7rem, 1vw, 1rem);
+}
+
+/*
+ * The card's fill and edge, on a layer of its own so it can be scaled without
+ * touching the card's layout box — see the CardBg comment in Nav.jsx.
+ *
+ * `z-index: 0` with the content lifted to 1: a positioned child otherwise
+ * paints above every non-positioned sibling, and the panel would cover its own
+ * contents.
+ */
+/* The one card whose contents are a single control rather than a block of copy.
+   The shared padding gave it the height of a paragraph card; this is the middle
+   ground — enough of a margin around the well that it reads as sitting inside
+   the card rather than filling it. */
+.rail-email {
+  padding: 0.55rem;
+}
+
+.rail-cardbg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--rail-card);
+  border: 1px solid var(--rail-edge);
+  /* ~3 CSS px in the reference, where these read as square-ish panels rather
+     than as rounded tiles. */
+  border-radius: 0.25rem;
+  /* Unfolds from the corner it is anchored to, not from its middle. */
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.rail-brand > :not(.rail-cardbg),
+.rail-stats > :not(.rail-cardbg),
+.rail-links > :not(.rail-cardbg),
+.rail-ticker > :not(.rail-cardbg),
+.rail-email > :not(.rail-cardbg) {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The chip and the sentence under it are one card, as in the reference — two
+ * cards put a border between a logo and the line that introduces it, which
+ * reads as two unrelated blocks rather than one masthead.
+ */
+.rail-brand {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.6vh, 1.25rem);
+}
+
+.rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* The pill the hero wordmark flies into. It is a measurement target first and
+   a logo second, so it holds its box even while invisible — and the box is
+   sized to the word, since that is the shape being fitted into it. */
+.rail-mark {
+  display: grid;
+  place-items: center;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.25rem;
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(0.9375rem, 1.15vw, 1.1875rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.rail-socials {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.rail-social {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.3rem;
+  background: var(--ink);
+  color: var(--bone);
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.rail-social svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.rail-social:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.rail-note {
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  line-height: 1.45;
+  color: var(--ink-60);
+}
+
+/* Two across, as in the reference — stacked, the pair would push the links out
+   of a rail that has to fit one screen without scrolling. */
+.rail-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.rail-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+  align-items: center;
+}
+
+.rail-stat-value {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1.25rem, 1.9vw, 1.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  /* The accent on a light wash loses too much contrast on its own. */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 700 was being drawn as faux bold — IBM Plex Mono only shipped 400 and 500 to
+   the page, so the browser was smearing the 400. The weights are loaded now, so
+   this is the real cut. */
+.rail-stat-label {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.rail-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  /* Each pill is as wide as its own icon and label, not as wide as the card —
+     the reference sizes them to their content and lets the card's right edge
+     stay empty. */
+  align-items: flex-start;
+}
+
+.rail-link {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.3rem;
+  font-family: var(--mono);
+  font-size: clamp(0.8125rem, 0.95vw, 0.9375rem);
+  /* The type's own leading is what sets the pill's height once the padding is
+     this tight, so it is pinned rather than left to the inherited 1.55. */
+  line-height: 1.35;
+  /* The real 700 cut, now that the weight is actually loaded — this was faux
+     bold before and read as a smeared 400. */
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* Full ink on every pill, selected or not. The reference draws them all the
+     same weight of black and lets only the yellow fill mark the current one —
+     greying the rest made the menu read as mostly disabled. */
+  color: var(--ink);
+  /* Lighter than the card it sits in, as in the reference — a pill darker than
+     its container reads as a recess rather than as a button. */
+  background: var(--rail-pill);
+  border: 1px solid var(--rail-pill-edge);
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.rail-link-icon {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.rail-link:hover {
+  color: var(--ink);
+  background: var(--rail-card);
+}
+
+/* Listed, but with no section behind it yet. It looks exactly like the others —
+   only the cursor and the missing hover say it does not lead anywhere, so the
+   menu reads as one set rather than as half of it disabled. */
+.rail-link[data-empty] {
+  cursor: default;
+}
+
+.rail-link[data-empty]:hover {
+  background: var(--rail-pill);
+}
+
+/* Driven by the scroll position, not by the click — see useActiveSection. */
+.rail-link[aria-current] {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* ------------------------------------------------------------- the ticker */
+
+/*
+ * Card chrome, same as the rest, plus the clipping the strip runs inside.
+ */
+/* Its own padding, not the shared card padding: the strip is one line of type,
+   so it needs a fraction of the height a block of copy does. */
+.rail-ticker {
+  position: relative;
+  min-width: 0;
+  padding: 0.3rem 0;
+}
+
+/*
+ * The window. Its own padding is zero so the strip can run edge to edge, and
+ * the mask fades both ends into the card instead of cutting a word in half at
+ * the border.
+ */
+.rail-ticker-view {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1.25rem,
+    #000 calc(100% - 1.25rem),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 1.25rem,
+    #000 calc(100% - 1.25rem),
+    transparent
+  );
+}
+
+.rail-ticker-track {
+  display: flex;
+  width: max-content;
+  /*
+   * Exactly half, because the track holds the list twice. Any other distance
+   * lands the reset mid-list and the loop visibly jumps.
+   */
+  animation: rail-ticker 40s linear infinite;
+}
+
+.rail-ticker:hover .rail-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes rail-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.rail-ticker-run {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-right: 0.9rem;
+  line-height: 1.3;
+  font-family: var(--mono);
+  font-size: clamp(0.8125rem, 0.95vw, 0.9375rem);
+  /* 700 is the heaviest cut IBM Plex Mono ships, so the extra weight past it
+     comes from a hairline stroke on the glyphs rather than from a font-weight
+     the browser would only fake. */
+  font-weight: 700;
+  -webkit-text-stroke: 0.02em currentColor;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* A diamond between entries, the same mark the hero's trait card uses — one
+   device for "list item" across the page rather than two. */
+.rail-ticker-run li {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.rail-ticker-run li::after {
+  content: "";
+  width: 0.3rem;
+  height: 0.3rem;
+  background: var(--ink-40);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+/*
+ * Full ink on every entry.
+ *
+ * The stores were the only ones at full strength and the stack sat at 60%,
+ * which at this size read as half the strip being faded out rather than as an
+ * emphasis. One weight of black, and the diamonds carry the rhythm instead.
+ */
+.rail-ticker-run li {
+  color: var(--ink);
+}
+
+.on-dark .rail-ticker-run li {
+  color: var(--on-dark);
+}
+
+.on-dark .rail-ticker-run li::after {
+  background: var(--on-dark-16);
+}
+
+/* The well the address sits in: a step darker than the card around it, which is
+   what makes it read as a field to take something out of rather than as more
+   copy printed on the panel. */
+/* Tighter than the cards above it, on padding only — the address and the icon
+   keep their size, so the well loses height without losing legibility. */
+.rail-email-inset {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.05rem 0.15rem 0.05rem 0.45rem;
+  line-height: 1.25;
+  border-radius: 0.25rem;
+  background: var(--rail-inset);
+  border: 1px solid var(--rail-inset-edge);
+}
+
+.rail-email-link {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  font-weight: 700;
+  color: var(--ink);
+  /* The address is longer than the rail is wide, so it has to be allowed to end
+     in an ellipsis rather than push the copy button out of the card. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-email-copy {
+  flex: none;
+  display: grid;
+  place-items: center;
+  /* The icon inside stays 0.9rem; only its hit area shrinks. */
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.2rem;
+  color: var(--ink-60);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.rail-email-copy svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.rail-email-copy:hover {
+  background: var(--rail-card);
+  color: var(--ink);
+}
+
+/* The confirmation is the icon itself becoming a tick, held for a moment by the
+   component — no second element to place, and nothing to dismiss. */
+.rail-email-copy[data-copied] {
+  color: var(--ink);
+  background: var(--accent);
+}
+
+.on-dark .rail-email-inset {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: var(--on-dark-16);
+}
+
+.on-dark .rail-email-link {
+  color: var(--on-dark);
+}
+
+.on-dark .rail-email-copy {
+  color: var(--on-dark-60);
+}
+
+.rail-cta {
+  margin-top: auto;
+  padding: 0.8rem 1rem;
+  /* Clear of the rail's bottom edge — pinned by `margin-top: auto` it sat hard
+     against it. */
+  margin-bottom: clamp(0.5rem, 1.4vh, 1.1rem);
+  border-radius: 0.75rem;
+  background: var(--accent);
+  color: var(--ink);
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(1rem, 1.3vw, 1.3125rem);
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.rail-cta:hover {
+  background: var(--ink);
+  color: var(--accent);
+}
+
+/*
+ * The room the rail occupies.
+ *
+ * Only `main` moves over, not the hero: the hero is the one screen the rail is
+ * not yet on, and indenting it would leave a bone stripe down the left of the
+ * opening for no reason. The rail is fixed, so this is padding on the content
+ * rather than a layout column — nothing here can push the rail around.
+ */
+@media (min-width: 1000px) {
+  main {
+    padding-left: var(--rail-w);
+    /*
+     * Pulled up over the hero's tail.
+     *
+     * The pinned panel is 100vh, so once it releases it needs a full viewport
+     * of scrolling to clear the screen — and by then it is empty, which is the
+     * blank page that sat between the drawer finishing and About arriving.
+     * Overlapping that exact distance puts About's top edge at the top of the
+     * screen at the moment the pin ends: the drawer finishes assembling and the
+     * section is already there.
+     *
+     * The hero panel keeps scrolling over it for that stretch, which is
+     * harmless because it paints nothing by then — see the `pointer-events` and
+     * `autoAlpha` notes on `.hero-sticky`.
+     */
+    margin-top: -100vh;
+  }
+}
+
+/*
+ * Inverted state. `on-dark` is put on one card at a time by useNavTheme, as the
+ * edge between a bone section and a dark one passes that card — so the drawer
+ * turns over in sequence rather than all at once on a line the edge has already
+ * left behind. Only colours change — no geometry — so it cannot disturb the
+ * Flip that lands the monogram here.
+ *
+ * Everything the inverted rules touch is listed here. Anything left out of this
+ * list still inverts, but cuts to it while the card around it fades, which
+ * reads as the card being repainted twice.
+ */
+.rail-cardbg,
+.rail-note,
+.rail-link,
+.rail-email,
+.rail-social,
+.rail-stat-label,
+.rail-ticker-run li,
+.rail-ticker-run li::after,
+.rail-email-inset,
+.rail-email-link,
+.rail-email-copy {
+  transition: background-color 0.45s var(--ease), color 0.45s var(--ease),
+    border-color 0.45s var(--ease);
+}
+
+/* The fill moved to the background layer, so the inverted state has to follow
+   it there — recolouring the card itself now paints nothing. */
+.on-dark .rail-cardbg {
+  background: rgba(244, 243, 236, 0.08);
+  border-color: var(--on-dark-16);
+}
+
+/* The sentence and the menu answer for themselves rather than for the card
+   around them: both are tall enough that the edge is inside them for a moment,
+   and a whole menu turned white while its top half is still over bone is the
+   one place the wipe is visible as a mistake rather than as a sweep. */
+.rail-note.on-dark {
+  color: var(--on-dark-60);
+}
+
+.on-dark .rail-stat-label {
+  color: var(--on-dark);
+}
+
+.rail-link.on-dark {
+  background: transparent;
+  border-color: var(--on-dark-16);
+  color: var(--on-dark-60);
+}
+
+.rail-link.on-dark:hover,
+.rail-link.on-dark[aria-current] {
+  background: var(--accent);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+.on-dark .rail-social {
+  background: var(--on-dark);
+  color: var(--ink);
+}
+
+
+/* ------------------------------------------------------------------ hero */
+
+/*
+ * The scroll runway. The panel inside is a normal 100vh screen; this element's
+ * height is what gives the opening sequence somewhere to happen, and its own
+ * height is the 0–100% range every hero animation is timed against — "30% top"
+ * in the markup means 30% of the way down this box.
+ *
+ * 150vh, and the number is derived rather than picked.
+ *
+ * A 100vh sticky child stays pinned for `(H - 100vh)` of scroll, which is
+ * `(H - 100) / H` of the range. The last flight lands at 33%, so the pin has to
+ * last at least that long and not a scroll further:
+ *
+ *     (H - 100) / H = 0.33   ->   H = 150vh
+ *
+ * At 180vh the pin ran to 44% and the eleven points past the last landing were
+ * a pinned, empty screen — everything had already left and About had not
+ * started arriving. At 150 the panel releases the moment the drawer finishes,
+ * so About begins climbing into the space the hero is vacating.
+ */
+.hero {
+  position: relative;
+  min-height: 150vh;
+}
+
+/*
+ * Three stacked layers: wordmark at the back, portrait in the middle, interface
+ * in front. The portrait passing between the letters and the copy is the whole
+ * composition — flatten the z-order and it becomes a poster with a photo on it.
+ */
+/*
+ * Above the rail, not below it.
+ *
+ * The flights cross the drawer on their way in, and at the rail's z-index they
+ * passed behind its cards — the name and the note disappeared for the last part
+ * of the journey and reappeared already landed. The panel has no background of
+ * its own, so lifting it over the rail costs nothing: only what it actually
+ * paints (the wordmark, the portrait, the interface) sits in front, and the
+ * drawer shows through everywhere else.
+ *
+ * `position: sticky` makes this element a stacking context, which is why the
+ * z-index has to go here rather than on `.hero-fly` — a value on the flying
+ * layer itself would be clamped inside this box and never reach the rail.
+ */
+/*
+ * Click-through once it is empty.
+ *
+ * `main` is pulled up under this panel, so for the last viewport of the hero
+ * the panel is lying over the top of About. It paints nothing by then, but a
+ * transparent box still swallows clicks — hence `none` here and `auto` on the
+ * hero's own controls, which are gone (`autoAlpha`, so genuinely hidden rather
+ * than merely transparent) long before the overlap begins.
+ */
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  pointer-events: none;
+  height: 100vh;
+  min-height: 40rem;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--nav-h);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------- layer 1: wordmark -- */
+
+/*
+ * The name at display scale. 27vw is derived, not guessed: six capitals of
+ * Clash Display average ~0.58em of advance, so 6 × 0.58 × 27vw ≈ 94vw — the
+ * same near-full-bleed width the reference gives its wordmark.
+ *
+ * It starts hidden because the loading card's name flies into this box and
+ * only hands over on arrival.
+ */
+/* One rule for both. The loading card's name and the hero's wordmark must be
+   the same size in the same place, and the only way to guarantee that as this
+   scales is to give them a single definition rather than two that agree. */
+.hero-wordmark,
+.preload-name {
+  flex: none;
+  margin-top: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  /*
+   * Taller letterforms, narrower overall: 35vw for the height, then the inner
+   * span condenses the width back in.
+   *
+   * The two levers are separate on purpose. Height comes from font-size, so the
+   * glyphs are drawn at their real proportions and only then squeezed — going
+   * the other way (stretching a smaller size vertically) thickens the horizontal
+   * strokes and the result reads as a distorted font rather than a condensed one.
+   *
+   * `line-height: 0.6` holds the layout box near where 29vw left it while the
+   * glyphs grow past it. The overflow goes upward into the panel's nav-height
+   * padding, which is empty — this is what buys the extra height without pushing
+   * the interface below out of a panel that is exactly 100vh.
+   */
+  font-size: 35vw;
+  line-height: 0.6;
+  /*
+   * Positive, which looks wrong for display type until you account for the
+   * condense below.
+   *
+   * `scaleX(0.78)` squeezes the gaps between letters by the same 22% it squeezes
+   * the letters themselves, so the sidebearings the font ships with come out a
+   * fifth too tight. A negative tracking on top of that closed them completely —
+   * the letters were touching.
+   *
+   * 0.005em pre-transform lands at ~0.004em on screen. That is barely anything,
+   * and it should be: the goal is the font's own spacing surviving the squeeze,
+   * not tracked-out display type. 0.02em was enough to visibly gap the letters.
+   */
+  letter-spacing: 0.005em;
+  /*
+   * A flex container, not a block with centred text.
+   *
+   * The condensed name is still wider than the viewport before it is squeezed,
+   * and block layout cannot centre a box wider than its container — auto
+   * margins collapse to zero and it lands hard against the left edge, which is
+   * what put the gap on the left and clipped the P off the right.
+   *
+   * Flexbox centres overflow symmetrically, so the letters hang off both sides
+   * equally and `scaleX` then pulls them back in about a true centre.
+   */
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  color: var(--accent);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/*
+ * Sizing, shared by every level of both wordmarks.
+ *
+ * `max-content` + auto margins, NOT a full-width block with centred text. A
+ * full-width block whose text is wider than it overflows to the right only —
+ * `text-align: center` does not recentre content it cannot contain. The
+ * wordmark was therefore sitting off-centre by exactly half its overflow, which
+ * grew with the viewport: a fat gap on the left and the P clipped on the right,
+ * worse on wider screens.
+ *
+ * Sizing the box to the text removes the overflow entirely, so the auto margins
+ * have something real to centre and scaleX shrinks it symmetrically about a
+ * centre that is actually the middle of the letters.
+ */
+.hero-wordmark > span,
+.hero-wordmark-fly > span,
+.preload-name > span {
+  display: block;
+  width: max-content;
+  flex: none;
+}
+
+/*
+ * The condense. Horizontal only — vertical scaling would fatten the horizontal
+ * strokes and give away that this is a stretched font rather than a narrow one.
+ *
+ * 0.85, widened from 0.73: at 0.73 the name measured ~83% of the window and
+ * left a visible margin of dead bone on each side, where the reference runs its
+ * wordmark out to the gutters. Widening here rather than on `font-size` is
+ * deliberate — font-size would take the height up with it.
+ *
+ * It applies to exactly one level of each wordmark, and that level is never the
+ * one an animation writes to. Listing the flight box here as well would apply
+ * the squeeze twice, once per nested span: the name came out at 0.85 x 0.85 and
+ * the side margins reappeared.
+ */
+.hero-wordmark-fly > span,
+.preload-name > span {
+  transform: scaleX(0.85);
+  transform-origin: center;
+}
+
+/*
+ * The flight box. Deliberately transform-free: Flip writes this element's
+ * transform outright, so anything static here would be replaced the moment the
+ * flight starts. Its layout width is the name's uncondensed width, which is why
+ * the letters land inside the chip rather than filling it edge to edge — the
+ * visible glyphs are 85% of the box being fitted.
+ */
+.hero-wordmark-fly {
+  will-change: transform, opacity;
+}
+
+[data-preload] .hero-wordmark {
+  visibility: hidden;
+}
+
+/* ---------------------------------------------------- layer 2: portrait -- */
+
+.hero-photo {
+  position: absolute;
+  left: 50%;
+  /*
+   * Sized past the panel and hung below it.
+   *
+   * Growing height alone stops working once the head reaches the top: the box
+   * is bottom-anchored, so every extra pixel pushes the crown up into the clip
+   * and cuts it off. Dropping the bottom edge by the same amount the height
+   * gains keeps the top pinned at 0 and spends the increase downward instead,
+   * where the overflow costs nothing — that part of the frame is the subject's
+   * legs, below the fold either way.
+   *
+   * The pair must move together: height = 100vh + the bottom offset.
+   */
+  /* Hung below the panel by exactly what the height gains, so the top stays
+     pinned at 0 and the extra size is spent downward, off-screen. */
+  bottom: calc(100vh - var(--photo-h));
+  height: var(--photo-h);
+  translate: -50% 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  will-change: filter, opacity;
+}
+
+/*
+ * Carries the entrance, so it must fill the wrapper the wrapper's defocus acts
+ * on — otherwise the two transforms operate on different boxes.
+ *
+ * Promoted to its own compositor layer. Fading and moving an image this large
+ * repaints it every frame otherwise, which is the other half of why the
+ * entrance stuttered; `translateZ(0)` forces the layer up front rather than
+ * letting the browser decide partway through the tween.
+ */
+.hero-photo-in {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  /* Grows from where the figure meets the floor, so the feet stay planted and
+     the approach reads as distance closing rather than as a balloon inflating. */
+  transform-origin: bottom center;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+/*
+ * The portrait, with its bottom edge dissolved.
+ *
+ * The template's model was a full-length figure hung below the fold, so its
+ * bottom edge was never on screen. This portrait is cropped at the waist and
+ * sized to keep the face clear of the headline, which puts its bottom edge
+ * inside the viewport — a hard horizontal line across a person's lap, on a flat
+ * ground, reads as a pasted rectangle.
+ *
+ * The fade is doing a second job as well, and it is the more important one. The
+ * source photograph is Dileep sitting on a low wall; lift the subject out and
+ * the wall goes with it, leaving a man seated on nothing. Dissolving everything
+ * below the waist takes the pose out of the frame — what is left reads as an
+ * ordinary portrait. Which is why the stops are where they are: 60% is just
+ * under the belt. Moving them down puts the seat back on screen.
+ *
+ * On the mask rather than a gradient overlay: the hero is scrolled through and
+ * the section behind it moves, so anything painted on top would have to move
+ * with it. The mask travels with the image.
+ */
+.hero-photo img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  /*
+   * Two gradients, intersected: down and across.
+   *
+   * The crop runs through his knee on the right as well as his waist at the
+   * bottom, and at this size that second cut showed as a straight vertical edge
+   * standing on the bone. The horizontal pass only softens the last tenth of
+   * the width, which is past the arm — enough to take the edge off the leg
+   * without touching the hand.
+   */
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 88%),
+    linear-gradient(to right, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, #000 60%, transparent 88%),
+    linear-gradient(to right, #000 90%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Marked, not disguised. A stock model standing in for the site's owner would
+   read as finished and ship by accident. */
+.hero-photo-ph {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/*
+ * Deliberately dark. The claim and the trait list are white because in the
+ * finished screen they sit on a photographed subject in dark clothing; a pale
+ * grey stand-in would make both unreadable and send us tuning colours that are
+ * about to be wrong again. This previews the real contrast.
+ */
+/*
+ * `width: auto`, sized off the viewBox.
+ *
+ * Setting width:100% on a box whose own width came from an aspect-ratio which
+ * came from the parent's width — which came from this child — is circular, and
+ * the browser resolves it by stretching: the silhouette came out squat and the
+ * head was clipped. Letting the SVG's intrinsic 3:7 ratio derive the width from
+ * the height removes the loop entirely.
+ */
+.hero-photo-ph svg {
+  height: 100%;
+  width: auto;
+  fill: color-mix(in srgb, var(--ink) 52%, var(--muted));
+}
+
+/*
+ * Parked at the top of the portrait box, which is the one band nothing else
+ * occupies — the claim crosses the middle and the buttons sit along the bottom.
+ */
+.hero-photo-ph span {
+  position: absolute;
+  /* Chest height — below the wordmark, above the claim that crosses lower. */
+  top: 40%;
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  padding: 0.5rem 0.9rem;
+  border: 1px dashed var(--ink-40);
+  border-radius: 0.5rem;
+  background: var(--bone-lift);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+/* --------------------------------------------------- layer 3: interface -- */
+
+.hero-front a,
+.hero-front button {
+  pointer-events: auto;
+}
+
+.hero-front {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* Trimmed top and bottom to pay for the larger wordmark above. */
+  padding: var(--front-pad-top) var(--gutter) clamp(1rem, 2.4vh, 1.75rem);
+}
+
+/*
+ * The layer that leaves. It holds the column layout the panel used to hold
+ * itself, so splitting the interface in two changed nothing about where
+ * anything sits.
+ */
+.hero-fade {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/*
+ * The layer that travels, laid over the one that leaves.
+ *
+ * `inset: 0` against `.hero-front` resolves to its padding box — the same box
+ * the blocks in here were already measuring their absolute offsets from, so
+ * moving them out of the fading layer did not move them on screen.
+ */
+.hero-fly {
+  position: absolute;
+  inset: 0;
+  /* Nothing in here is interactive, and a full-panel overlay would otherwise
+     take the clicks meant for the buttons underneath it. */
+  pointer-events: none;
+}
+
+/*
+ * The flight itself is a transform Flip writes here, so this element carries
+ * no transform of its own — only the opacity that hands over to the rail's
+ * copy at the end of the flight.
+ */
+.hero-fly-item {
+  will-change: transform, opacity;
+}
+
+.hero-navrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /*
+   * Clearance from the wordmark.
+   *
+   * The wordmark's `line-height: 0.6` deliberately holds its layout box smaller
+   * than its letters, so the glyphs hang below the box the flex gap is measured
+   * from — the row looked welded to the descenders even though the boxes were
+   * not touching. This is the difference the box does not account for.
+   */
+  margin-top: var(--navrow-gap);
+  /*
+   * Pulled out past the page gutter, so the row runs closer to both edges than
+   * the content below it. The reference sets its nav almost edge to edge — the
+   * row is a frame around the composition, not a column inside it.
+   */
+  margin-inline: calc(var(--gutter) * -0.55);
+  /* Sits over the portrait, so it needs its own stacking context to stay
+     clickable rather than merely visible. */
+  position: relative;
+  z-index: 1;
+}
+
+.hero-navgroup {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.2vw, 2.5rem);
+}
+
+/*
+ * The roll.
+ *
+ * A window exactly one line tall over a stack of two identical labels. Hover
+ * slides the stack up by half its height — precisely one line — so the top copy
+ * exits and the bottom copy lands where it was.
+ *
+ * The two line-heights must match: the window's height and the stack's step are
+ * the same measurement, and if they drift the word arrives off its own baseline.
+ */
+.hero-navlink {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.35em;
+  line-height: 1.35;
+  font-family: var(--mono);
+  /* 600, not 500: a mono at 500 renders visibly lighter than the surrounding
+     ink and read as grey against the bone even though the colour was already
+     black. The weight is what was missing, not the value. */
+  font-weight: 600;
+  font-size: clamp(0.875rem, 1.25vw, 1.25rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.hero-navlink-roll {
+  display: block;
+  /*
+   * Its own curve, not `--ease`.
+   *
+   * `--ease` is an expo-out: it covers ~90% of the distance in the first
+   * quarter of the duration. That is right for something arriving from off
+   * screen, and wrong here — the travel is one line tall, so the roll was over
+   * before the eye caught it and the label just looked like it blinked.
+   *
+   * A symmetric in-out spends time in the middle of the move, which is the only
+   * part of this effect anyone actually sees.
+   */
+  transition: transform 0.42s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+.hero-navlink-roll > span {
+  display: block;
+  line-height: 1.35;
+}
+
+.hero-navlink:hover .hero-navlink-roll,
+.hero-navlink:focus-visible .hero-navlink-roll {
+  transform: translateY(-50%);
+}
+
+/* The roll is motion for its own sake. Without it the link still needs a hover
+   state, so the colour shift carries it alone. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-navlink-roll {
+    transition: none;
+  }
+
+  .hero-navlink:hover .hero-navlink-roll {
+    transform: none;
+  }
+
+  .hero-navlink:hover {
+    color: var(--slate);
+  }
+}
+
+/*
+ * The centre column is sized to the portrait, not to its own contents.
+ *
+ * With equal `1fr` tracks either side, the centre column is centred — and so is
+ * the portrait. Making that column as wide as the portrait therefore puts the
+ * right column's left edge exactly at the portrait's right edge, at every window
+ * size, with no measurement in JavaScript and no number to keep in sync.
+ *
+ * Uncapped, deliberately. A first pass clamped this track to 40vw "in case the
+ * portrait got too wide", which broke the one thing the track exists for: on a
+ * tall narrow window the cap came in under the portrait's real width, the right
+ * column started before the portrait ended, and the card sat on top of the
+ * subject's shoulder. A narrow portrait was never the problem — it gives the
+ * side columns more room, not less.
+ */
+.hero-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(var(--photo-w), auto)
+    minmax(0, 1fr);
+  align-items: end;
+  gap: var(--hero-gap);
+}
+
+.hero-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.3vh, 1rem);
+}
+
+.hero-col--center {
+  align-items: center;
+  text-align: center;
+  /* The grid bottom-aligns its columns, so lifting this one is a bottom margin
+     rather than a top offset. */
+  margin-bottom: clamp(1.5rem, 5vh, 4rem);
+}
+
+/*
+ * Lifted out of the grid as a whole.
+ *
+ * The card used to be absolute on its own and the note stayed bottom-aligned in
+ * the grid row, which is why they sat at opposite ends of the column. Moving the
+ * positioning up to the column keeps the two together: the card starts on the
+ * nav row's line as before, and the note simply follows it in flow.
+ *
+ * Collapsing this column out of the grid does not shift the portrait — the two
+ * side columns are `minmax(0, 1fr)`, so they split the free space evenly whether
+ * or not either holds content.
+ */
+.hero-col--right {
+  /* Both children read from the left edge, as in the reference: the card sits
+     flush on the portrait's edge and the note is indented off it. */
+  align-items: flex-start;
+  text-align: left;
+  gap: clamp(0.6rem, 1.4vh, 1.1rem);
+
+  position: absolute;
+  /* Same line as the hero's right-hand menu row. */
+  top: calc(var(--front-pad-top) + var(--navrow-gap));
+  /* Viewport centre offset by half the portrait, so the column's left edge
+     lands on the portrait's right edge. */
+  left: 50%;
+  margin-left: calc(var(--photo-w) / 2);
+  width: calc(50% - var(--photo-w) / 2 - var(--gutter));
+}
+
+/*
+ * The glass recipe, taken from the reference: a translucent wash of the muted
+ * tone over a heavy backdrop blur, with a hairline white edge. The blur is
+ * what makes these read as panes over the portrait rather than as flat boxes.
+ */
+.glass {
+  background: color-mix(in srgb, var(--muted) 30%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: clamp(0.5rem, 0.7vw, 0.9rem);
+  padding: clamp(0.85rem, 1.5vw, 1.6rem);
+}
+
+/*
+ * The mirror of the trait card: pinned to the portrait's left edge instead of
+ * the page gutter, so the pair reads as sitting on the subject rather than
+ * beside them. Only the cards leave the grid — the kicker below stays in flow
+ * and keeps its bottom-left corner of the panel, as in the reference.
+ */
+.hero-cards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.6rem, 1.2vw, 1.1rem);
+  /* Right edges on the portrait's edge; the stagger is the offset below. */
+  align-items: flex-end;
+
+  position: absolute;
+  top: calc(var(--front-pad-top) + var(--navrow-gap));
+  right: 50%;
+  /* Past the portrait's edge, not up to it — the overlap onto the subject is
+     the effect, and stopping at the edge only looks like a near miss. */
+  margin-right: calc(var(--photo-w) / 2 - clamp(2rem, 5vw, 6rem));
+}
+
+/*
+ * The reference does not stack these flush — the lower card steps back off the
+ * portrait's edge, which is what stops the two from reading as one tall box.
+ *
+ * Split across two rules because each card now sits inside a flight wrapper:
+ * the offsets belong to the wrapper (it is the box that moves), the card's own
+ * shape to the card.
+ */
+.hero-cards > *:nth-child(2) {
+  margin-right: clamp(0.75rem, 1.6vw, 1.75rem);
+  /* Dropped clear of the card above, on top of the stack's own gap. */
+  margin-top: clamp(1.75rem, 4.5vh, 4rem);
+}
+
+.hero-cards > *:nth-child(2) .glass {
+  /* Narrower and taller than the card above it — the reference's lower card is
+     the portrait one of the pair, which is what makes the stagger read.
+     *
+     * Stacked, not side by side. The width here is set by the content, not by
+     * `min-width` — a row of value + gap + 7ch label has a floor no width
+     * property can push under. Turning it into a column drops that floor to the
+     * wider of the two lines, which is what makes the card narrow and tall. */
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+  padding-block: clamp(0.8rem, 1.45vw, 1.55rem);
+  padding-inline: clamp(0.6rem, 1vw, 1rem);
+}
+
+.hero-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  min-width: clamp(11rem, 18vw, 17rem);
+  /*
+   * Its own measurements rather than the shared `.glass` padding, to match the
+   * weight the trait card carries on the other side. Trimmed by roughly what
+   * the type below gained, so the box holds its size while the numbers grow —
+   * these cards shrink-wrap, so type and padding are one budget, not two.
+   */
+  padding: clamp(0.5rem, 1vw, 1.05rem) clamp(0.9rem, 1.5vw, 1.5rem);
+}
+
+.hero-stat-value {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.75rem, 4.6vw, 4.875rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  /* The accent on translucent glass loses too much contrast on its own. */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.hero-stat-label {
+  font-family: var(--mono);
+  /* Off the shared label token — these two sit on the portrait at hero scale
+     and were reading a step smaller than everything around them. */
+  font-size: clamp(0.8125rem, 1.05vw, 1.0625rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  max-width: 7ch;
+  /* White on the card's own light wash, with the ground left alone as asked —
+     the shadow is doing all the contrast work here, so it has to be heavier
+     than a decorative one. */
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(0, 0, 0, 0.45);
+}
+
+.hero-kicker {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.hero-claim {
+  font-family: var(--display);
+  font-weight: 700;
+  /* 5.7vw is the reference's own ratio, measured off its hero. */
+  font-size: clamp(2.5rem, 5.7vw, 6.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  color: #fff;
+  /* Lines read as a left-aligned block, as in the reference — centring made the
+     short last line ("Properly.") float out of line with the two above it. The
+     block itself is still centred on the portrait by the column. */
+  text-align: left;
+  /*
+   * Edge definition only.
+   *
+   * The wide 30px shadow this used to carry pooled into a dark cloud behind the
+   * three lines and read as a panel the text was sitting on — exactly the box
+   * that was not wanted. A tight shadow keeps the glyphs legible against the
+   * photograph without tinting the area around them.
+   */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/*
+ * SplitText reads the element's computed `text-align` when it splits and writes
+ * it back onto every line it creates as an inline style (SplitText.js:62-65).
+ * The rule above therefore only reaches the lines if it was already in place at
+ * split time — for anything split under the old centred value, the inline style
+ * wins and no ordinary declaration can reach it. Hence the `!important`.
+ */
+.hero-claim > * {
+  text-align: left !important;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: clamp(0.5rem, 0.9vw, 0.9rem);
+}
+
+.btn {
+  padding: clamp(0.7rem, 0.95vw, 1.1rem) clamp(1.15rem, 1.75vw, 2rem);
+  border-radius: clamp(0.55rem, 0.85vw, 1rem);
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.3vw, 1.3125rem);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.btn:hover {
+  background: var(--ink);
+  color: var(--accent);
+}
+
+.btn--ghost {
+  background: var(--ink);
+  color: var(--bone);
+}
+
+.btn--ghost:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/*
+ * Back to the light `.glass` ground, and therefore back to ink.
+ *
+ * These two are one decision, not two. White was legible on the dark fill this
+ * card carried a moment ago; on a light tint over bone it is a ~1.3:1 contrast
+ * ratio — invisible, not subtle. Lightening the ground and keeping white text
+ * would have shipped an empty-looking card.
+ *
+ * If the white is what matters more than the light ground, the dark fill has to
+ * come back with it.
+ */
+.hero-traits {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.35rem, 0.7vw, 0.65rem);
+  text-align: left;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(0.9375rem, 1.25vw, 1.3125rem);
+  letter-spacing: -0.015em;
+  /*
+   * White, and therefore dark-grounded.
+   *
+   * These are one decision. The shared `.glass` wash is a light tint over bone
+   * and white on it is ~1.3:1 — invisible. The reference gets away with white
+   * because its card overlaps the subject's black shirt; ours sits at the
+   * portrait's edge, mostly over bone, so it has to bring its own dark ground.
+   */
+  color: #fff;
+  /*
+   * Lightened again on request, past where white alone holds. The shadow is
+   * what pays for it: on a ground this pale the glyphs would otherwise smear
+   * into the bone behind them, and the dark halo restores the edge that the
+   * fill used to provide.
+   */
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+  border-color: rgba(255, 255, 255, 0.45);
+  /* Tighter than the shared `.glass` curve — at this card's size the inherited
+     radius read as a rounded pill rather than a panel. */
+  border-radius: clamp(0.25rem, 0.35vw, 0.45rem);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.55),
+    0 0 10px rgba(0, 0, 0, 0.4);
+
+  /* Bigger, as its own measurements rather than the shared `.glass` padding. */
+  font-size: clamp(1.125rem, 1.75vw, 1.875rem);
+  gap: clamp(0.65rem, 1.25vw, 1.15rem);
+  padding: clamp(1.4rem, 2.4vw, 2.5rem) clamp(1.75rem, 3vw, 3.25rem);
+
+  /* A floor on the width so the card reads as a panel rather than shrink-wrap
+     around five short words. The pinning now lives on `.hero-col--right`, which
+     carries both this card and the note below it. */
+  min-width: clamp(10rem, 12vw, 14rem);
+  max-width: 100%;
+}
+
+.hero-traits li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hero-traits li::before {
+  content: "";
+  flex: none;
+  width: 0.7em;
+  height: 0.7em;
+  background: var(--accent);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+/*
+ * Indented off the card and wider than it, which is the reference's shape: the
+ * note starts about a third of the way into the card above it and runs out to
+ * the gutter, so the two read as a staggered pair rather than one stacked block.
+ */
+/* The placement moved out to the flight wrapper, which is the box that travels
+   — Flip measures the element carrying `data-flip-id`, so that element has to
+   be the one whose position and width describe the note on screen. */
+.hero-note-fly {
+  align-self: stretch;
+  margin-left: clamp(2rem, 4.5vw, 5rem);
+  /* Clear of the card above it, on top of the column's own gap. */
+  padding-top: clamp(0.75rem, 1.6vh, 1.4rem);
+}
+
+.hero-note {
+  font-size: clamp(0.9375rem, 1.15vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--ink-60);
+}
+
+/*
+ * The middle beat of the hero sequence. Absolutely positioned so it can hold
+ * the centre of the screen without ever entering the grid above — the grid is
+ * still there, just faded out by this point.
+ */
+/* Indented past the rail. The panel now paints above the drawer, and by the
+   time this beat arrives the drawer is fully assembled — centred on the whole
+   viewport it would cross the cards. */
+/* Scroll affordance — a 300vh hero needs to say out loud that it is scrollable,
+   otherwise the opening reads as a static screen. */
+.hero-cue {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1rem, 3vh, 2rem);
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.hero-cue-line {
+  width: 1px;
+  height: 2.5rem;
+  background: linear-gradient(var(--ink-40), transparent);
+}
+
+/* ----------------------------------------------------------------- about */
+
+.about {
+  padding: var(--section-y) 0;
+  background: var(--bone-warm);
+}
+
+/*
+ * A full screen with the heading pinned to the top and the cards to the bottom.
+ *
+ * `justify-content: space-between` on a column that is at least a viewport tall
+ * is what produces the reference's diagonal — heading top-left, cards
+ * bottom-right — without positioning either of them absolutely.
+ */
+.about-inner {
+  min-height: calc(100vh - var(--section-y));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(2.5rem, 8vh, 6rem);
+}
+
+.about-head {
+  max-width: 46rem;
+}
+
+/* The outlined chip. `width: fit-content` so the border wraps the words rather
+   than running the width of the column. */
+.about-chip {
+  width: fit-content;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: clamp(0.625rem, 0.72vw, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-statement {
+  margin-top: clamp(1.25rem, 3vh, 2.25rem);
+  font-family: var(--display);
+  /* 600, not 700 — at this size the heaviest cut closed up the counters and the
+     two lines read as one slab. */
+  font-weight: 600;
+  font-size: clamp(1.875rem, 4vw, 3.75rem);
+  line-height: 1.02;
+  /* Barely negative. The tight display tracking is for the hero's wordmark; at
+     this size it was what welded the words together. */
+  letter-spacing: -0.015em;
+  /* Tracking opens the letters inside a word as much as the gaps between them,
+     so it cannot separate words on its own — this widens only the spaces. */
+  word-spacing: 0.12em;
+}
+
+.about-body {
+  margin-top: clamp(1.25rem, 2.4vw, 2.5rem);
+  /* Wraps to three short lines, as the reference's does — the paragraph is the
+     one place on this screen that should not run the width of the column. */
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.3vw, 1.375rem);
+  line-height: 1.5;
+  /* Full ink. The reference sets this paragraph solid black, not the muted
+     grey the rest of the page's body copy uses — it is the only sentence on
+     the screen and it carries the weight of one. */
+  color: var(--ink);
+}
+
+.about-body p + p {
+  margin-top: 1rem;
+}
+
+/* ---- the journey, as a timeline zigzagging down from the first screen ---- */
+
+/*
+ * The positioned ancestor for both layers, and the only place the lane is
+ * written down.
+ *
+ * `--wire-lane` is the gap between a card's outer edge and the stroke beside
+ * it. The step's padding reserves it and `useJourneyWire` reads the same value
+ * to place the line, so the two cannot drift apart. It is in px because the
+ * hook parses it — a rem here would be read as its own number.
+ */
+.about-track {
+  --wire-lane: 22px;
+  position: relative;
+  margin-top: clamp(2rem, 6vh, 5rem);
+  /*
+   * So the cards can be sized against the track rather than against the row
+   * they sit in. A percentage width resolves against the parent, and the two
+   * rows do not have the same parent width — the left-hand row gives up a
+   * quarter of itself to the indent — so `36%` drew the left cards 58px
+   * narrower than the right ones. `cqw` is a share of this box, which is the
+   * one both sides have in common.
+   */
+  container-type: inline-size;
+}
+
+/*
+ * Under the cards, deliberately.
+ *
+ * The diagonal from one dot to the next runs through the card it is heading
+ * for; the card painting over that stretch is what makes the line read as
+ * passing behind it. `overflow: visible` because the strokes stand in the
+ * padding lane, which is inside the box, but the dots' radius is not.
+ */
+.about-wire {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.about-wire-stem,
+.about-wire-link {
+  fill: none;
+  /* One weight for both. The stem needs it because it is losing ink down its
+     own length; the curve needs it because it is the longest stroke on the page
+     and the only one crossing bare ground between two cards. A hairline reads
+     as a hairline at either job. */
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/*
+ * The stem is not one colour: it carries its weight at the top, where it meets
+ * the card's shoulder, and fades to almost nothing at the dot. The stroke
+ * itself is a gradient built in `useJourneyWire` — only the two ends of it are
+ * set here, because these are the page's ink and belong with the palette.
+ *
+ * No `stroke` on `.about-wire-stem` in this file, deliberately: a CSS
+ * declaration outranks the `stroke="url(#…)"` the hook writes, and would paint
+ * the gradient out.
+ */
+.about-wire-fade-top {
+  stop-color: var(--ink-60);
+}
+
+.about-wire-fade-mid {
+  stop-color: var(--ink-40);
+}
+
+/* Gone, not faint. The dot is the end of the stroke, and a stroke that is still
+   just visible where the dot sits reads as a line stopping short of it rather
+   than as the line resolving into it. */
+.about-wire-fade-foot {
+  stop-color: rgba(0, 0, 0, 0);
+}
+
+/*
+ * The curve holds full ink from end to end. It is the thing that makes five
+ * panels into one path, and unlike the stem it has no card beside it to be read
+ * against — it crosses bare page for its whole run, so it cannot afford either
+ * the fade or the lighter tone a rule beside a card can carry.
+ */
+.about-wire-link {
+  stroke: var(--ink-60);
+}
+
+.about-wire-dot {
+  fill: var(--accent);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.about-steps {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  /* A screenful between cards. The gap is the diagonal's run: close them up and
+     the connecting line flattens into a dash between two panels. */
+  gap: clamp(4rem, 22vh, 14rem);
+}
+
+.about-step {
+  display: flex;
+}
+
+/*
+ * The staircase, in three rules.
+ *
+ * A card goes flush right, then in to a quarter of the way across, then a step
+ * further left again, and the fourth starts the run over. The two left-hand
+ * stops are close together on purpose — the second step is a short one, so the
+ * run reads as walking in the same direction rather than as another jump.
+ *
+ * Neither left stop runs to the margin: the stroke and its dot stand in the
+ * space to the card's left, and the curve between two dots needs room to bow
+ * out past them.
+ */
+.about-step[data-side="right"] {
+  justify-content: flex-end;
+  padding-right: calc(var(--wire-lane) * 2);
+}
+
+.about-step[data-side="mid"] {
+  justify-content: flex-start;
+  padding-left: max(calc(var(--wire-lane) * 3), 24%);
+}
+
+.about-step[data-side="left"] {
+  justify-content: flex-start;
+  padding-left: max(calc(var(--wire-lane) * 3), 17%);
+}
+
+.about-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Roughly a third of the content column, as the reference's is, and about
+     half a screen tall — the card is one beat of a story, not a summary box. */
+  width: clamp(22rem, 40cqw, 36rem);
+  min-height: clamp(18rem, 44vh, 27rem);
+  padding: clamp(1.5rem, 2.2vw, 2.25rem);
+  border-radius: 1rem;
+  background: var(--rail-card);
+  border: 1px solid var(--rail-edge);
+  /*
+   * The depth the year's flip is seen through.
+   *
+   * It belongs here rather than in the tween: as a tween property it animates
+   * along with everything else, so it would run down to nothing over the course
+   * of the flip and the last few degrees would tear rather than turn. On the
+   * parent it is a fixed property of the card — one viewing distance, held for
+   * the whole rotation.
+   */
+  perspective: 700px;
+  /*
+   * A soft drop shade, so the card sits above the page rather than being cut
+   * out of it — which is what the timeline needs: the wire passes *behind* the
+   * cards, and a panel with no shadow makes that read as the line simply
+   * stopping at an edge.
+   *
+   * Offset down and blurred, no spread: the light on this page comes from
+   * above (the cards' top edge is the lighter one), so a shade that sits
+   * directly under the card is the only one consistent with it.
+   */
+  box-shadow: 0 2px 8px var(--ink-12);
+}
+
+/* The year at display scale, which is what the reference leads each card with
+   and the one thing on the card that can be read from across the room. */
+.about-card-year {
+  /* The hinge the flip turns on: the year swings up from its own baseline
+     rather than spinning about its middle, which is what makes it read as a
+     card being turned face-up instead of a number rotating. */
+  display: block;
+  transform-origin: 50% 100%;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  /* The accent alone is too light on a bone card to read as type. */
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.about-card-title {
+  margin-top: clamp(0.75rem, 1.6vh, 1.25rem);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.375rem, 1.9vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.about-card-body {
+  margin-top: 0.75rem;
+  max-width: 38ch;
+  font-size: clamp(1rem, 1.05vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--ink-60);
+}
+
+/* Pushed to the card's floor by `margin-top: auto`, so the footers line up
+   across cards whose bodies run to different lengths. */
+.about-card-foot {
+  margin-top: auto;
+  padding-top: clamp(1rem, 2.4vh, 1.75rem);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.about-card-avatar {
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  border-radius: 999px;
+  object-fit: cover;
+  /* The portrait is a full-length cut-out, so a centred crop lands on the
+     chest — pulled up to the head. */
+  object-position: top center;
+  background: var(--muted);
+}
+
+.about-card-who {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  line-height: 1.35;
+  color: var(--ink-40);
+  /* Two short lines, always. "5 years ago" breaking after the number turned the
+     footer into three rows and pushed the button out of line with it. */
+  white-space: nowrap;
+}
+
+.about-card-who strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/*
+ * Pinned to the far end of the footer, where the reference puts it.
+ *
+ * Filled rather than the pale outline it used to be. On a bone card the
+ * outlined version sat within a couple of values of the ground and read as a
+ * caption with a line round it; a fill with some weight behind it is what makes
+ * a chip read as the thing to press.
+ *
+ * A warm grey, not the dark the rest of the page uses. Black was tried here and
+ * is far too much at this size — a small chip in near-black on a light card
+ * punches a hole in it and pulls the eye off the card's own text, which is what
+ * a reader is actually there for. This is a few steps down from the bone, on
+ * the same warm axis, so it sits on the card rather than on top of it.
+ */
+.about-card-more {
+  margin-left: auto;
+  flex: none;
+  white-space: nowrap;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--chip);
+  color: var(--on-dark);
+  font-size: 0.9rem;
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+/*
+ * The one moment the accent appears in this section.
+ *
+ * The label goes to ink on the way in, and has to: white on this yellow is
+ * around 1:1 and would simply disappear. Every other yellow surface on the page
+ * — the hero's button, the rail's call to action, the active menu pill — sets
+ * its type in black for the same reason, so the swap is also what keeps this
+ * chip recognisably part of the same set.
+ */
+.about-card-more:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+/*
+ * Nothing to open yet — every journey step is `href: null` today, so this is
+ * currently what all of them look like, hover included.
+ *
+ * No separate treatment any more: the chip is meant to read as a button, and a
+ * placeholder that dims itself out reads as a broken one instead. What it costs
+ * is that a chip lights up under the cursor and then does nothing when pressed.
+ * Filling in `href` on the JOURNEY steps in data.js is what settles that, and
+ * this rule can go with it.
+ */
+.about-card-more[data-empty] {
+  cursor: default;
+}
+
+/* --------------------------------------------------- the card, opened */
+
+/*
+ * The same card, holding the whole story.
+ *
+ * It does not open into a panel and it does not leave its slot: it turns dark
+ * where it stands, grows to fit, and pushes the rest of the staircase down the
+ * page. That is what makes the timeline the thing being read rather than a menu
+ * of things that each launch a dialog — and it is why the wire still runs to it.
+ *
+ * Height is animated in About.jsx; everything below is the resting state at
+ * either end of that. The colour change is left to CSS and transitions on its
+ * own, which is what lets the dark arrive slightly ahead of the growth.
+ */
+.about-card {
+  transition: background-color 0.45s var(--ease), border-color 0.45s var(--ease),
+    color 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+
+.about-card[data-open="true"] {
+  /* Wider than the closed card as well as taller: at the closed width a story
+     this long sets forty lines deep and the card runs past a screen. */
+  width: clamp(22rem, 52cqw, 44rem);
+  background: var(--dark-lift);
+  border-color: var(--dark-lift);
+  color: var(--on-dark);
+  /* Lifted further off the page than its neighbours, because it now is. */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+/* The number is the one thing that was already at display scale, so it grows
+   least — enough to stay the largest thing on the card, not enough to become a
+   different element. */
+.about-card[data-open="true"] .about-card-year {
+  font-size: clamp(3.5rem, 6.5vw, 7rem);
+  text-shadow: none;
+}
+
+.about-card[data-open="true"] .about-card-title {
+  margin-top: clamp(1.25rem, 3vh, 2rem);
+  font-size: clamp(1.75rem, 3.4vw, 3rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.about-card-close {
+  position: absolute;
+  top: clamp(1rem, 2vw, 1.6rem);
+  right: clamp(1rem, 2vw, 1.6rem);
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.85rem;
+  background: rgba(244, 243, 236, 0.12);
+  color: var(--on-dark);
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.about-card-close svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.about-card-close:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/* The byline, moved up under the year. Same parts as the closed card's foot,
+   without the chip — the control that was there is now the × above it. */
+.about-card-by {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: clamp(1.25rem, 3vh, 2rem);
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--on-dark-60);
+}
+
+.about-card-by strong {
+  display: block;
+  font-weight: 700;
+  color: var(--on-dark);
+}
+
+.about-card-story {
+  margin-top: clamp(1rem, 2.5vh, 1.5rem);
+  /* Wider than the closed card's 38ch: this is a passage rather than a caption,
+     and a long read set to caption measure is a column of broken lines. */
+  max-width: 54ch;
+  font-size: clamp(1rem, 1.1vw, 1.1875rem);
+  line-height: 1.62;
+  color: var(--on-dark-60);
+}
+
+/* The card's own avatar sits on bone when closed and on the dark ground when
+   open, so its empty-state fill has to follow it. */
+.about-card[data-open="true"] .about-card-avatar {
+  background: var(--on-dark-16);
+}
+
+/* -------------------------------------------------------------- projects */
+
+/*
+ * The first dark screen on the page. `data-nav-dark` on the section is what
+ * inverts the rail while this passes behind it — see useNavTheme.
+ */
+.projects {
+  /* One number in two places: the card is this wide, and the gap the row opens
+     with is the screen less this — see the right-edge start below. */
+  --card-w: clamp(15rem, 26vw, 27rem);
+  background: var(--dark);
+  color: var(--on-dark);
+  padding: var(--section-y) 0 0;
+}
+
+.projects-chip {
+  width: fit-content;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--on-dark-16);
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-dark-60);
+}
+
+/*
+ * Heading left, intro right, as the reference has it. Two columns rather than a
+ * stack: this screen's whole job is to introduce a row of work, and a tall
+ * column of type above it would use the height the row needs.
+ */
+.projects-headline {
+  margin-top: clamp(1.25rem, 3vh, 2.25rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(2rem, 4vw, 5rem);
+  align-items: end;
+}
+
+.projects-statement {
+  font-family: var(--display);
+  font-weight: 600;
+  /* A step down from the about heading's ceiling. That one has the whole
+     content column; this one has two thirds of it, and at the same size the
+     second line broke in three. */
+  font-size: clamp(1.75rem, 3.4vw, 3.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  word-spacing: 0.12em;
+}
+
+.projects-intro {
+  max-width: 42ch;
+  font-size: clamp(1rem, 1.15vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--on-dark-60);
+}
+
+/*
+ * The runway. Its height is written by `useProjectsRail` — it is the distance
+ * the row has to travel plus a screen to sit through, and neither is knowable
+ * from here. The value below is only what stands before the hook has measured,
+ * and on the reduced-motion and mobile paths where it never does.
+ */
+.projects-rail {
+  height: auto;
+  margin-top: clamp(2.5rem, 7vh, 6rem);
+}
+
+.projects-view {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  /* The row is wider than the screen by design; without this it would be the
+     page's horizontal scrollbar rather than a section's own movement. */
+  overflow: hidden;
+}
+
+.projects-track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 2vw, 2rem);
+  list-style: none;
+  /* Starts on the same line the heading does, and keeps a full gutter of dark
+     to the right of the last card so the row ends rather than being cut. */
+  padding-inline: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter)));
+}
+
+.project-card {
+  position: relative;
+  flex: none;
+  width: var(--card-w);
+  height: min(72vh, 42rem);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--dark-lift);
+  isolation: isolate;
+}
+
+/* The plate fills the card and everything else sits on top of it. Same rule for
+   both kinds: `object-fit` crops a photograph dropped in later, and the drawn
+   plate crops itself through `preserveAspectRatio="slice"`. */
+.project-plate {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A wash under the top and bottom rows. The pills and the name sit on whatever
+   the image happens to be behind them, and on a light plate they would vanish. */
+.project-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0) 28%,
+    rgba(0, 0, 0, 0) 55%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
+.project-top,
+.project-foot {
+  position: absolute;
+  z-index: 1;
+  left: clamp(1rem, 1.6vw, 1.5rem);
+  right: clamp(1rem, 1.6vw, 1.5rem);
+}
+
+.project-top {
+  top: clamp(1rem, 1.6vw, 1.5rem);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* Tight for pills: the card is a quarter of the screen wide and three of these
+   have to share its top edge, so the padding is what decides whether the last
+   one wraps onto the artwork. */
+.project-index,
+.project-tags li {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(10, 10, 12, 0.55);
+  border: 1px solid var(--on-dark-16);
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--on-dark);
+  /* The pills sit on a photograph; without this the ground behind them is
+     whatever the image is doing at that pixel. */
+  backdrop-filter: blur(6px);
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  list-style: none;
+}
+
+/* Held at the bottom of the label range: three tags and the index have to share
+   one line across a card this narrow, and the alternative to a smaller pill is
+   a tag dropped onto the artwork below it. */
+.project-tags li {
+  font-size: 0.6875rem;
+}
+
+.project-foot {
+  bottom: clamp(1rem, 1.6vw, 1.5rem);
+}
+
+.project-name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.4vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.project-tagline {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  color: var(--on-dark-60);
+}
+
+/* Covers the card, above the wash and the text, so the whole panel is the
+   target rather than the name alone. */
+.project-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.project-hit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/*
+ * The row answers the cursor.
+ *
+ * Five lit plates side by side all ask for attention at once. Under a pointer
+ * the one being looked at keeps its light and the rest go down to a dark, so the
+ * row reads as one card selected out of five rather than five competing — and
+ * the cards are wide enough that the reader is only ever near one of them.
+ *
+ * `:has` on the track, so the dark only comes on while a card is actually under
+ * the cursor. Hovering the gap between two cards is not a choice, and dimming
+ * everything when the pointer crosses one would be the row flickering.
+ *
+ * Pointer devices only. On a touch screen `:hover` sticks to whatever was last
+ * tapped, which would leave four cards dark with nothing to bring them back.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .project-card {
+    transition:
+      filter 0.5s var(--ease),
+      transform 0.5s var(--ease),
+      box-shadow 0.5s var(--ease);
+  }
+
+  .projects-track:has(.project-card:hover) .project-card {
+    filter: brightness(0.34) saturate(0.55);
+  }
+
+  /* The `:has` is repeated rather than dropped: without it this rule is less
+     specific than the one above and the card under the cursor goes down with
+     the rest of them. */
+  .projects-track:has(.project-card:hover) .project-card:hover {
+    filter: none;
+    /* Enough to lift off the row and no more — the card is already the biggest
+       thing on the screen, and a card that jumps reads as a button. */
+    transform: translateY(-10px) scale(1.015);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: filter 0.2s linear;
+    }
+
+    .projects-track:has(.project-card:hover) .project-card:hover {
+      transform: none;
+    }
+  }
+}
+
+/*
+ * Full bleed, under the drawer.
+ *
+ * `main` is indented by the rail's width, which left a bone stripe down the
+ * left of this screen while the rest of it was dark. Pulling the section back
+ * by that same width makes the dark ground the whole window, and the row now
+ * runs off the true left edge rather than stopping at the rail — the cards
+ * travel under the drawer and leave the screen behind it.
+ *
+ * The two blocks inside then have to put back the room the section just gave
+ * up, or they would sit under the drawer as well:
+ *
+ *  - The heading is read, so it keeps exactly the position it had. The extra
+ *    max-width is the rail's width, which is what keeps the wrap's own centring
+ *    landing on the same line as every other section's.
+ *  - The row starts on that same line and is padded on the left only, so the
+ *    first card is clear of the drawer at rest; the right-hand gutter stays the
+ *    section's own, since nothing is fixed over that edge.
+ */
+@media (min-width: 1000px) {
+  .projects {
+    margin-left: calc(var(--rail-w) * -1);
+  }
+
+  .projects-head {
+    max-width: calc(var(--wrap) + var(--rail-w));
+    padding-left: calc(var(--gutter) + var(--rail-w));
+  }
+
+  /*
+   * The row opens at the right-hand edge.
+   *
+   * Everything before the first card is padding, so this is the whole screen
+   * less one card and its gutter: the row arrives with a single card against
+   * the right edge and the rest of the screen dark, and walks left from there.
+   * The reference opens this way, and it is the shape that makes the row read
+   * as something being brought in rather than something already laid out and
+   * waiting.
+   *
+   * The runway lengthens by exactly this much on its own — `useProjectsRail`
+   * measures the overflow rather than being told it.
+   */
+  .projects-track {
+    padding-left: calc(100vw - var(--card-w) - var(--gutter));
+  }
+
+  /*
+   * Nothing travels under reduced motion — the hook collapses the runway and
+   * the row just sits there — so the opening gap would be a screen of empty
+   * dark with one card in the corner and no way to reach the rest. Back to the
+   * heading's line, where the row starts full.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .projects-track {
+      padding-left: calc(
+        var(--rail-w) +
+          max(
+            var(--gutter),
+            calc((100vw - var(--wrap) - var(--rail-w)) / 2 + var(--gutter))
+          )
+      );
+    }
+  }
+
+  /*
+   * The dark the cards leave into.
+   *
+   * The drawer's own cards are a light wash on a hairline — a treatment that
+   * assumes one flat colour behind it, and behind it now is whatever plate
+   * happens to be passing. This puts the flat colour back: solid across the
+   * drawer's width, then a short fade, so the row dims out under the drawer
+   * instead of sliding beneath it at full brightness.
+   */
+  .projects-view::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 2;
+    width: calc(var(--rail-w) + 5rem);
+    background: linear-gradient(
+      to right,
+      var(--dark) 0%,
+      var(--dark) calc(var(--rail-w) - 1rem),
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+/* ---------------------------------------------------- what you get */
+
+/*
+ * The light screen after the dark one.
+ *
+ * A lit field rather than a flat bone: the bloom at the top is what the huge
+ * heading sits in, and it is the same light the project plates are standing in
+ * one section earlier, which is what ties the two screens together across the
+ * change of ground.
+ */
+.what-you-get {
+  position: relative;
+  /* The tail is deliberately long: the sentence inks in as it is scrolled
+     through, and it needs room below it to be scrolled through in. */
+  padding: clamp(5rem, 14vh, 11rem) 0 clamp(6rem, 20vh, 14rem);
+  background:
+    radial-gradient(
+      110% 70% at 50% 12%,
+      #fbf9ee 0%,
+      rgba(251, 249, 238, 0) 62%
+    ),
+    linear-gradient(180deg, #eae6d5 0%, #ddd9c7 58%, #d2cebb 100%);
+  color: var(--ink);
+  text-align: center;
+  overflow: hidden;
+}
+
+.wyg-title {
+  font-family: var(--display);
+  font-weight: 600;
+  /* Its own clamp rather than --t-display: this is the largest type on the
+     page and is meant to run edge to edge, which the shared step does not. */
+  font-size: clamp(3.4rem, 12.5vw, 11rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+
+/* The one outlined thing on the page. It is a label, not a control, so it takes
+   a hairline rather than the filled pill the nav and the buttons use. */
+.wyg-label {
+  display: inline-block;
+  margin-top: clamp(1.75rem, 5vh, 3.5rem);
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wyg-statement {
+  /* Stated rather than inherited: this is the colour the scrubbed fill above
+     ends on, and a resting state a tween reads should not depend on which
+     ancestor happens to be setting it. */
+  color: var(--ink);
+  max-width: 62rem;
+  margin: clamp(1.25rem, 3.5vh, 2.5rem) auto 0;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 4vw, 3.35rem);
+  /* Open, not set solid. The lines carry chips that stand taller than the type
+     and letters that lift as they ink in, and both need somewhere to go. */
+  line-height: 1.38;
+  letter-spacing: -0.02em;
+  /* The gaps between words are real space characters between the inline-block
+     words, so this reaches them. Wider than the display face sets them: the
+     letters ink in one at a time and the eye needs the word to end somewhere
+     obvious for the wave to read as moving word to word. */
+  word-spacing: 0.24em;
+  /* Balanced, so the last line is never one orphaned word under three full
+     ones — at this size that reads as a mistake rather than as a line break. */
+  text-wrap: balance;
+}
+
+/*
+ * Every letter is its own box so it can be inked on its own, and every word is
+ * a box around its letters so a line still breaks between words.
+ *
+ * `inline-block` is load-bearing on the letters: `yPercent` has nothing to
+ * measure against on an inline box, so the lift would do nothing.
+ */
+.wyg-word {
+  display: inline-block;
+}
+
+.wyg-ink {
+  display: inline-block;
+}
+
+/*
+ * The chips in the sentence.
+ *
+ * A pale tile with a yellow glyph, sitting on the baseline of type several
+ * times its size. The nudge down is what puts the glyph's optical centre on the
+ * x-height rather than leaving the tile riding high on the line.
+ */
+.wyg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18em;
+  margin-inline: 0.14em;
+  padding: 0.14em 0.3em;
+  border-radius: 0.3em;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.07);
+  transform: translateY(0.08em);
+  color: var(--accent);
+}
+
+.wyg-chip svg {
+  width: 0.7em;
+  height: 0.7em;
+  /* The glyph is yellow on near-white, which is the reference's own treatment.
+     It is decorative — the sentence reads identically with the chips gone — so
+     it is not carrying anything a reader has to be able to make out. */
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.14));
+}
+
+.wyg-caret {
+  width: 0.42em;
+  height: 0.42em;
+  color: var(--ink-40);
+  filter: none;
+}
+
+@media (min-width: 1000px) {
+  /* Full bleed under the drawer, with the content put back on the same line
+     every other section keeps — the same pair of rules the contact and project
+     screens use. */
+  .what-you-get {
+    margin-left: calc(var(--rail-w) * -1);
+  }
+
+  .what-you-get > .wrap {
+    max-width: calc(var(--wrap) + var(--rail-w));
+    padding-left: calc(var(--gutter) + var(--rail-w));
+  }
+}
+
+/* --------------------------------------------------------------- contact */
+
+.contact {
+  padding: var(--section-y) 0 clamp(3rem, 8vh, 6rem);
+  background: var(--dark);
+  color: var(--on-dark);
+}
+
+.contact .eyebrow {
+  color: var(--on-dark-60);
+}
+
+/*
+ * The closing claim, in two layers.
+ *
+ * The second line is the same size and the same face as the first and is set at
+ * a sixth of the ink, so it reads as the sentence continuing at a distance
+ * rather than as a smaller subtitle. The overlap is what sells it: the faded
+ * word is pulled up under the solid line's descenders, which is the depth cue —
+ * two lines merely stacked read as two lines.
+ */
+.contact-claim {
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  font-family: var(--display);
+  font-weight: 600;
+  /* Its own clamp rather than --t-display: this sits under a fixed rail and
+     above an email address set at 5.5vw, and has to stay in proportion to
+     both. */
+  font-size: clamp(2.5rem, 8.5vw, 7.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+
+.contact-claim-front,
+.contact-claim-back {
+  display: block;
+}
+
+.contact-claim-back {
+  /* Behind, not beside. The negative margin is in `em` so the overlap holds its
+     proportion at every step of the clamp above. */
+  margin-top: -0.06em;
+  color: rgba(244, 243, 236, 0.17);
+}
+
+.contact-pitch {
+  max-width: 46rem;
+  margin-top: clamp(1.5rem, 4vh, 2.75rem);
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  color: var(--on-dark-60);
+}
+
+/*
+ * The question and the way to answer it.
+ *
+ * Stacked and left-aligned rather than side by side: the bubble is something
+ * being said and the button is the reply, and a reply set beside the question
+ * reads as two controls rather than as a conversation.
+ */
+.contact-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.6rem, 1.4vh, 1rem);
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+}
+
+/*
+ * A speech bubble, not a label.
+ *
+ * The tail is a rotated square rather than a border trick, so it takes the same
+ * fill as the bubble and stays put when the pill's radius changes. It sits on
+ * the left edge, which is where it would be if a portrait were standing there —
+ * see the note in Contact.jsx about the photograph this is still waiting for.
+ */
+.contact-bubble {
+  position: relative;
+  padding: clamp(0.7rem, 0.95vw, 1.1rem) clamp(1.15rem, 1.75vw, 1.75rem);
+  border-radius: clamp(0.55rem, 0.85vw, 1rem);
+  background: var(--dark-lift);
+  color: var(--on-dark);
+  font-size: var(--t-lead);
+}
+
+.contact-bubble::after {
+  content: "";
+  position: absolute;
+  left: clamp(1.4rem, 2vw, 2rem);
+  bottom: -0.32rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--dark-lift);
+  transform: rotate(45deg);
+  border-radius: 0.15rem;
+}
+
+/*
+ * The one place the yellow button sits on black.
+ *
+ * `.btn` fades to ink on hover, which is this section's own background — the
+ * button would vanish under the cursor. Swapping to the light ink keeps the
+ * same inversion the hover is doing everywhere else, on a ground that can
+ * show it.
+ */
+.contact .btn:hover {
+  background: var(--on-dark);
+  color: var(--ink);
+}
+
+.contact-mail {
+  display: inline-block;
+  margin-top: clamp(2.5rem, 7vh, 5rem);
+  font-family: var(--display);
+  font-weight: 600;
+  /* Its own clamp, not --t-display: an email address is far longer than the
+     hero headline and would otherwise run off the side at large sizes. */
+  font-size: clamp(1.75rem, 5.5vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  word-break: break-word;
+  transition: color 0.35s var(--ease);
+}
+
+.contact-mail:hover {
+  color: var(--accent);
+}
+
+.contact-foot {
+  margin-top: clamp(3rem, 10vh, 7rem);
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--on-dark-16);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-dark-60);
+}
+
+.contact-socials {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.contact-socials a:hover {
+  color: var(--accent);
+}
+
+/*
+ * Full bleed, for the same reason the projects screen is.
+ *
+ * This is the other section that turns the drawer's ink white as it passes
+ * behind it, and with the ground stopping at the rail the drawer wore its dark
+ * dress over a bone stripe. Same pull-back, same compensation on the wrap so
+ * the type keeps the line it had.
+ */
+@media (min-width: 1000px) {
+  .contact {
+    margin-left: calc(var(--rail-w) * -1);
+  }
+
+  .contact > .wrap {
+    max-width: calc(var(--wrap) + var(--rail-w));
+    padding-left: calc(var(--gutter) + var(--rail-w));
+  }
+}
+
+/* ==========================================================================
+   Motion guards
+   ========================================================================== */
+
+/*
+ * Every animation is authored as a `.from()`, so the resting CSS above is the
+ * finished state and the page is complete with no JS at all. The one problem
+ * that creates is the gap before GSAP runs — it waits on document.fonts.ready,
+ * and until then the nav and hero would be visible in their final positions
+ * only to jump back and animate in.
+ *
+ * So the document starts marked `data-motion="pending"`, set by an inline
+ * script in index.html that also checks prefers-reduced-motion. The engine
+ * clears it in the same tick it applies the from-states.
+ */
+[data-motion="pending"] .tl-hide {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .tl-hide {
+    visibility: visible !important;
+  }
+
+  /* A pinned 300vh runway is pure scroll cost when nothing animates through
+     it, so the hero collapses back to an ordinary screen. */
+  .hero {
+    min-height: 0;
+  }
+
+  .hero-sticky {
+    position: static;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Both exist only to fill the pinned runway. With the hero collapsed to a
+     single static screen the statement has no space of its own and, being
+     absolutely positioned, lands straight on top of the headline. */
+  .hero-cue {
+    display: none;
+  }
+}
+
+/*
+ * Short desktop windows.
+ *
+ * The wordmark is sized in `vw` and the panel is exactly `100vh`, so a wide but
+ * shallow window — a laptop with the dock and a terminal open — gets a wordmark
+ * proportioned for a screen it does not have, and the bottom row of the
+ * interface runs off the panel. Capping the type against viewport height and
+ * tightening the column gaps buys back the difference.
+ *
+ * Height-only, so it never fires on the ordinary desktop case.
+ */
+@media (min-width: 1000px) and (max-height: 840px) {
+  .hero-wordmark,
+  .preload-name {
+    font-size: min(35vw, 62vh);
+  }
+
+  .hero-col {
+    gap: clamp(0.35rem, 0.9vh, 0.7rem);
+  }
+
+  .hero-col--right {
+    gap: clamp(0.4rem, 1vh, 0.75rem);
+  }
+
+  /* Retuned on the token, not on the margin — the trait card reads the same
+     value to stay level with the row. */
+  .hero-front {
+    --navrow-gap: clamp(0.5rem, 1.4vh, 1rem);
+  }
+
+  /* Five rows of traits is the tallest thing in the right column, and on a
+     shallow window it is what tips the grid past the panel's bottom edge. */
+  .hero-traits {
+    font-size: clamp(0.9375rem, 1.2vw, 1.25rem);
+    gap: 0.45rem;
+    padding: 1rem 1.4rem;
+  }
+}
+
+/* ==========================================================================
+   Responsive
+   --------------------------------------------------------------------------
+   Below 1000px the engine skips every `data-tl-desktop` movement, so the
+   layout has to stand on its own here: the hero unpins, the work panels stop
+   stacking, and the nav drops its centre rail.
+   ========================================================================== */
+
+@media (max-width: 999px) {
+  :root {
+    --nav-h: 4rem;
+  }
+
+  .hero {
+    min-height: 0;
+  }
+
+  .hero-sticky {
+    position: static;
+    height: auto;
+    min-height: 100svh;
+    padding-bottom: clamp(3rem, 8vh, 5rem);
+  }
+
+  /*
+   * The three-layer composition does not survive a phone. The wordmark shrinks
+   * to a band, the portrait moves from behind the interface to above it, and
+   * the three columns become one — a stacked document rather than a scene.
+   */
+  /* Bumped to pay for the condense: the inner span takes 22% of the width back
+     out, so 22vw here would have rendered noticeably smaller than it did before
+     the wordmark was narrowed. */
+  .hero-wordmark,
+  .preload-name {
+    font-size: 27vw;
+    line-height: 0.72;
+  }
+
+  .hero-photo {
+    position: relative;
+    left: auto;
+    /* The desktop rule hangs this below the panel to buy size. In the phone's
+       stacked flow there is nothing to hang from — it would just push the
+       interface down. */
+    bottom: auto;
+    translate: none;
+    height: 44svh;
+    margin-inline: auto;
+    /* The desktop rule bottom-aligns the portrait inside a full-height box.
+       Here the box is the portrait, so that alignment only starves it. */
+    align-items: stretch;
+  }
+
+  /* Two columns of stats side by side rather than a stack — the phone has the
+     width for it and the hero has no vertical room to spare. */
+  .hero-cards {
+    flex-direction: row;
+    align-self: stretch;
+    /* No portrait alongside to pin against — back into the flow. */
+    position: static;
+    margin-right: 0;
+  }
+
+  .hero-cards > *:nth-child(2) {
+    margin-right: 0;
+    margin-top: 0;
+  }
+
+  /* Both cards share a row here, so the pair has to match. */
+  .hero-cards > *:nth-child(2) .glass {
+    min-width: 0;
+    padding-block: clamp(0.85rem, 3vw, 1.25rem);
+  }
+
+  /* The wrappers only exist to be flown, and nothing flies below 1000px — but
+     they are still flex items, so they have to carry the sizing the cards
+     inside them would otherwise get from the row. */
+  .hero-cards > * {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hero-cards > * > .glass {
+    height: 100%;
+  }
+
+  .hero-stat {
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    /* The desktop padding was sized for a card floating on the portrait; two of
+       these side by side on a phone cannot afford it. */
+    padding: clamp(0.85rem, 3vw, 1.25rem);
+  }
+
+  /* 7ch was sized for the desktop card's fixed width and forces "EXPERIENCE"
+     out through the side of a card that is now fluid. */
+  .hero-stat-label {
+    max-width: none;
+  }
+
+  .hero-front {
+    justify-content: flex-start;
+    gap: clamp(1.5rem, 5vh, 2.5rem);
+  }
+
+  .hero-navrow {
+    display: none;
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(1.5rem, 5vh, 2.5rem);
+  }
+
+  .hero-col--center,
+  .hero-col--right {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* The lift only means something against a bottom-aligned grid row. */
+  .hero-col--center {
+    margin-bottom: 0;
+  }
+
+  /* The single-column stack puts the portrait above, not alongside, so there is
+     nothing to pin against — the column rejoins the flow. */
+  .hero-col--right {
+    position: static;
+    margin-left: 0;
+    max-width: none;
+  }
+
+  /* Nothing sits on the portrait any more, so the shadows that made these
+     legible against it are only muddying them. */
+  .hero-claim {
+    color: var(--ink);
+    text-shadow: none;
+  }
+
+  /* Nothing to sit beside here — the portrait is above, not alongside — so the
+     card rejoins the flow and fills the column. */
+  .hero-traits {
+    width: 100%;
+    /* The desktop floor assumes the card sits beside the portrait; in the flow
+       the column already decides its width. */
+    min-width: 0;
+  }
+
+  /* The stagger reads against a card pinned beside the portrait; in the stacked
+     layout an indent here would just look like a stray margin. */
+  .hero-note-fly {
+    margin-left: 0;
+  }
+
+  /* The flight layer is a desktop-only overlay; stacked, its blocks belong in
+     the flow with everything else. */
+  .hero-fly {
+    position: static;
+  }
+
+  .hero-cue {
+    display: none;
+  }
+
+  /*
+   * The drawer becomes a top bar.
+   *
+   * A 16vw fixed column is most of a phone screen, and none of the rail's
+   * scroll choreography compiles down here anyway (`data-tl-desktop`), so the
+   * blocks that only made sense as a drawer — the note, the stats, the address
+   * — drop out and the mark and the CTA hold the bar on their own.
+   */
+  .rail {
+    inset: 0 0 auto 0;
+    width: 100%;
+    height: var(--nav-h);
+    padding: 0 var(--gutter);
+    align-items: center;
+  }
+
+  .rail-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .rail-brand {
+    padding: 0;
+  }
+
+  /* The panel it draws only exists as part of the drawer; in the top bar the
+     mark stands on the page directly. */
+  .rail-cardbg {
+    display: none;
+  }
+
+  .rail-note,
+  .rail-stats,
+  .rail-links,
+  .rail-ticker,
+  .rail-email {
+    display: none;
+  }
+
+  .rail-cta {
+    margin-top: 0;
+    /* Centred in a top bar, not pinned to the bottom of a column — the drawer's
+       bottom gap would just push it off the bar's centre line. */
+    margin-bottom: 0;
+    padding: 0.6rem 1.15rem;
+  }
+
+  /* One column, and no zigzag to trace. The wire is not built at this width —
+     five strokes down the side of five stacked cards is not a timeline — so the
+     steps give back the lane that was reserved for it. */
+  .about-inner {
+    min-height: 0;
+  }
+
+  .about-steps {
+    gap: clamp(1rem, 4vh, 2rem);
+  }
+
+  .about-step {
+    padding: 0;
+  }
+
+  .about-card {
+    width: 100%;
+    min-height: 0;
+  }
+
+  /*
+   * The row becomes an ordinary swipeable scroller.
+   *
+   * A viewport held still while content is dragged across it is a fight with a
+   * touch device: the finger is already the thing that moves content sideways.
+   * `useProjectsRail` builds nothing at this width, so the runway keeps its CSS
+   * height and the view stops sticking.
+   */
+  .projects-headline {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 4vh, 2rem);
+    align-items: start;
+  }
+
+  .projects-view {
+    position: static;
+    height: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* Room for the momentum overscroll, and for the scrollbar some platforms
+       draw inside the box. */
+    padding-block: 0.5rem 1.5rem;
+  }
+
+  .project-card {
+    width: min(80vw, 22rem);
+    height: min(70vh, 30rem);
+    scroll-snap-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .rail-cta {
+    display: none;
+  }
+
+}

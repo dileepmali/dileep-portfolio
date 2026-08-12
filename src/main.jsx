@@ -1,14 +1,14 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { HashRouter } from "react-router-dom";
 import App from "./App.jsx";
-import "./index.css";
-import "./cinematic.css";
+import "./styles/index.css";
 
-createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
-  </React.StrictMode>
-);
+/*
+ * StrictMode is deliberately omitted.
+ *
+ * It double-invokes effects in development, which for this app means the
+ * timeline engine builds, reverts and rebuilds — SplitText re-splits already
+ * split markup and Flip measures boxes mid-teardown. The result is a hero that
+ * misbehaves only in dev, which is the worst place for a bug to live.
+ */
+createRoot(document.getElementById("root")).render(<App />);
