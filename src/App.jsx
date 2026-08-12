@@ -1,75 +1,55 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import CTA from "./components/CTA";
-import {
-  HomePage,
-  AboutPage,
-  ServicesPage,
-  ResumePage,
-  ProjectsPage,
-  BlogsPage,
-  ContactPage,
-} from "./Pages";
-import { useSmoothScroll } from "./useSmoothScroll";
-import { useReveal } from "./useReveal";
-import { useInteractions } from "./useInteractions";
-import { usePageTransition } from "./usePremium";
-import { usePageMotion } from "./usePageMotion";
+import Preload from "./sections/Preload";
+import Nav from "./sections/Nav";
+import Hero from "./sections/Hero";
+import About from "./sections/About";
+import Projects from "./sections/Projects";
+import WhatYouGet from "./sections/WhatYouGet";
+import Contact from "./sections/Contact";
+import { useSmoothScroll } from "./motion/useSmoothScroll";
+import { useTimeline } from "./motion/useTimeline";
+import { useNavTheme } from "./motion/useNavTheme";
 
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
-    else window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-}
-
+/*
+ * One page, four sections, no router.
+ *
+ * The site previously carried seven routes, four of which held template
+ * placeholder copy. A portfolio with two shipped projects is a single scroll —
+ * the routing was structure borrowed from a template that had more to say.
+ *
+ * Both hooks mount once here and cover the whole document: Lenis smooths the
+ * scroll position, and the timeline engine compiles every `data-tl-*`
+ * declaration in the markup below into GSAP tweens.
+ */
 export default function App() {
-  const { pathname } = useLocation();
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light"
-  );
-
   useSmoothScroll();
-  useReveal(pathname); // HOME one-pager reveals
-  usePageMotion(pathname); // distinct signature motion per dedicated page
-  useInteractions(pathname); // pointer tilt / spotlight / magnetic buttons
-  usePageTransition(pathname); // cinematic panel wipe on every route change
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+  // Scoped to the document, not to `#page`: the nav sits outside the page
+  // wrapper (it is fixed and has to outlive the hero) but its assembly is
+  // declared against the hero's scroll range, so both must compile together.
+  useTimeline("body");
+  // Inverts the fixed nav's colours over the dark sections, which it would
+  // otherwise be invisible against.
+  useNavTheme();
 
   return (
     <>
-      {/* cinematic route-transition panels (sweep up to reveal each page) */}
-      <div className="page-wipe" aria-hidden="true">
-        <span />
-        <span />
-        <span />
+      {/* Skip link — the hero is 300vh of scripted motion, so a keyboard user
+          needs a way past it that does not involve tabbing through it. It aims
+          at About now that the work section is gone; a link to a removed anchor
+          would leave the keyboard user exactly where they started. */}
+      <a className="skip" href="#about">
+        Skip to content
+      </a>
+      <Preload />
+      <Nav />
+      <div id="page">
+        <Hero />
+        <main>
+          <About />
+          <Projects />
+          <WhatYouGet />
+          <Contact />
+        </main>
       </div>
-      <ScrollToTop />
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
-      <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/resume" element={<ResumePage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/blogs" element={<BlogsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="*" element={<HomePage />} />
-        </Routes>
-      </main>
-      {pathname !== "/" && <CTA />}
-      <Footer />
     </>
   );
 }
